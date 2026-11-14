@@ -1,0 +1,29 @@
+# Normalize line endings: store LF in the repository for all text files.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF
+*.bat  text eol=crlf
+*.cmd  text eol=crlf
+*.ps1  text eol=crlf
+
+# Binary files (never diff or convert)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.glb   binary
+*.gltf  binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.pdf   binary
+*.docx  binary
+*.xlsx  binary
+*.pptx  binary
+*.zip   binary
+
+# Keep lockfiles out of diff noise and merge conflicts on GitHub
+pnpm-lock.yaml linguist-generated=true -diff

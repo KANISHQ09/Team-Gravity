@@ -1465,7 +1465,7 @@ Team sync every 3 hours (10 minutes): what is done, what is blocked, what is cut
 ## 4.6 Git Branch Strategy
 
 - **Trunk-based development.** `main` is always deployable and protected (CI required).
-- Short-lived branches named `feat/<area>-<topic>`, `fix/<topic>`, `chore/<topic>`; merge within hours, squash on merge.
+- Short-lived branches named `feature/<area>-<topic>`, `fix/<topic>`, `docs/<topic>`, `chore/<topic>` off `main` (no `develop` branch); merge within hours, squash on merge. See `docs/ROADMAP.md`.
 - During the hackathon: one reviewer approval or a verbal "ship it" on the team call; in production: one required review.
 - Conventional Commits (`feat:`, `fix:`, `docs:`) for readable history and automatic changelogs.
 - Tags `v0.1.0` at submission; release branches only after v1.0.

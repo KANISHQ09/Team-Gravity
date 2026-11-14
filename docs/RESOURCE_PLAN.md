@@ -1,6 +1,6 @@
 # GRAVITY — Resource Plan
 
-> Status: **Draft for team review.** Covers the provided NASA and partner resources, the libraries and services we'd use, and how data is sourced and labeled. Library choices depend on [TECH_STACK](TECH_STACK.md) approval.
+> Status: **Draft for team review.** Covers the provided NASA and partner resources, the libraries and services we'd use, and how data is sourced and labeled. Libraries and services follow the approved [TECH_STACK](TECH_STACK.md) (full Gravity.md stack).
 
 ## 1. Provided challenge resources (`resources/resource.docx`)
 
@@ -30,7 +30,7 @@ Every source is recorded in `docs/DATA_LEDGER.md` (created in Phase 4) with colu
 | Instrument and part mass, power, cost | Simplified ranges informed by public mission fact sheets | `GAME` |
 | Similar real missions | Hand-picked list of about 10 missions with links; every fact checked | `NASA` |
 
-## 3. Libraries (pending stack approval)
+## 3. Libraries (approved stack; installed in Phase 5)
 
 | Purpose | Library | License (verify at install) |
 | --- | --- | --- |
@@ -40,22 +40,37 @@ Every source is recorded in `docs/DATA_LEDGER.md` (created in Phase 4) with colu
 | Charts | recharts | MIT |
 | 3D (stretch) | three, @react-three/fiber, @react-three/drei | MIT |
 | Validation | zod | MIT |
-| Server | fastify, socket.io, socket.io-client, pino | MIT |
+| Animation | framer-motion | MIT |
+| Server | fastify, @fastify/jwt, @fastify/rate-limit, @fastify/cookie, socket.io, socket.io-client, pino | MIT |
+| Database | drizzle-orm, drizzle-kit, postgres (driver) | Apache-2.0 / Unlicense (verify) |
+| Redis / realtime scaling | ioredis, @socket.io/redis-adapter | MIT |
+| Jobs | bullmq | MIT |
+| API docs | @asteasolutions/zod-to-openapi | MIT |
 | Offline | vite-plugin-pwa | MIT |
-| Testing | vitest, fast-check, @testing-library/react, playwright, axe-core | MIT / Apache-2.0 / MPL-2.0 (axe-core) |
+| i18n | i18next, react-i18next | MIT |
+| Monitoring | @sentry/react, @sentry/node, posthog-js | MIT |
+| Monorepo | turbo | MIT |
+| Testing | vitest, fast-check, @testing-library/react, testcontainers, playwright, axe-core, k6 | MIT / Apache-2.0 / MPL-2.0 (axe-core) / AGPL-3.0 (k6, a CLI tool only, not bundled) |
 | Quality | eslint, typescript-eslint, eslint-plugin-jsx-a11y, prettier | MIT |
 
 ## 4. Services and accounts
 
 | Service | Purpose | Needed when | Cost |
 | --- | --- | --- | --- |
-| GitHub | Repo, issues, Actions CI | Phase 2 | Free |
-| Vercel or Netlify | Static web hosting | First deploy (needs approval) | Free tier |
-| Render or Fly.io | Socket.IO room server | Co-op deploy (needs approval) | Free / low tier |
+| GitHub | Repo, issues, Actions CI, CodeQL, Dependabot | Phase 2 | Free |
+| Docker Desktop | Local Postgres 16 + Redis (Docker Compose) | Phase 5 | Free |
+| Neon | Managed PostgreSQL with point-in-time recovery | Phase 5 (create early) | Free tier |
+| Upstash | Managed Redis | Phase 5 (create early) | Free tier |
+| Vercel | Static web hosting | First deploy (needs approval) | Free tier |
+| Fly.io | Docker server (Socket.IO + REST) | First deploy (needs approval) | Free / low tier |
+| Cloudflare R2 (or S3) | Backups, images, 3D models | Before production | Free tier |
+| Sentry | Error tracking | When monitoring is enabled | Free tier |
+| Better Stack or Grafana Cloud | Logs and metrics | When monitoring is enabled | Free tier |
+| PostHog | Anonymous analytics, Web Vitals | When analytics is enabled | Free tier |
 | NASA Open APIs (`api.nasa.gov`) | Live data panel | **Future only** | Free key |
 | Claude API | Mission Mentor coach | **Future only** | Paid |
 
-No external API keys are needed for the MVP.
+Account sign-ups are for a team member to do; Claude does not create accounts or handle credentials.
 
 ## 5. People (team of 4–5)
 
