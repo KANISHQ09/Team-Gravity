@@ -3,7 +3,17 @@ import { runMission } from '@gravity/engine';
 import { BALANCE_DESIGNS } from '../../../../packages/engine/tests/fixtures/designs.ts';
 import { useGame } from '../store/game.ts';
 import { useOnline } from '../store/online.ts';
-import { type RoomSocket, attach } from './realtime.ts';
+import { render, screen } from '@testing-library/react';
+import { createElement } from 'react';
+import { OnlineTeamBar } from '../features/rooms/OnlineTeamBar.tsx';
+import {
+  REJOIN_GRACE_MS,
+  type RoomSocket,
+  attach,
+  leaveRoom,
+  removableIn,
+  removeMember,
+} from './realtime.ts';
 
 /** A fake Socket.IO client that records emits and lets the test fire server events. */
 function fakeSocket() {
@@ -45,12 +55,13 @@ describe('online room client', () => {
       design,
       version: 3,
       members: [
-        { userId: 'me', roles: ['mission-architect'], vote: null, connected: true },
+        { userId: 'me', roles: ['mission-architect'], vote: null, connected: true, isHost: true },
         {
           userId: 'friend',
           roles: ['spacecraft-engineer', 'science-lead', 'operations'],
           vote: null,
           connected: true,
+          isHost: false,
         },
       ],
       proposals: [],
@@ -109,5 +120,91 @@ describe('online room client', () => {
     expect(useOnline.getState().active).toBe(false);
     expect(useGame.getState().players[0]?.roles).toHaveLength(4);
     expect(useGame.getState().stage).toBe('design');
+  });
+
+  describe('room lifecycle', () => {
+    const design = emptyDesign('lunar-orbiter', 'engineer');
+    const snap = (hostId: string, members: { userId: string; connected: boolean }[]) => ({
+      roomId: 'r1',
+      code: 'K7QX2M',
+      hostId,
+      status: 'design',
+      design,
+      version: 1,
+      members: members.map((m) => ({ ...m, roles: [], vote: null, isHost: m.userId === hostId })),
+      proposals: [],
+    });
+
+    it('tells me when I become the host after the host leaves', () => {
+      const { socket, fire } = fakeSocket();
+      useOnline.getState().set({ active: true, me: 'me', code: 'K7QX2M' });
+      attach(socket, 'K7QX2M');
+      fire(
+        'room:state',
+        snap('boss', [
+          { userId: 'boss', connected: true },
+          { userId: 'me', connected: true },
+        ]),
+      );
+      expect(useGame.getState().notice).toBeNull();
+      fire('room:state', snap('me', [{ userId: 'me', connected: true }]));
+      expect(useOnline.getState().hostId).toBe('me');
+      expect(useGame.getState().notice).toMatch(/left the room/);
+      expect(useGame.getState().notice).toMatch(/You are now the room host/);
+    });
+
+    it('lets the host free a seat only after the grace period', () => {
+      vi.useFakeTimers();
+      try {
+        const { socket, emitted, fire } = fakeSocket();
+        useOnline.getState().set({ active: true, me: 'me', code: 'K7QX2M' });
+        attach(socket, 'K7QX2M');
+        fire(
+          'room:state',
+          snap('me', [
+            { userId: 'me', connected: true },
+            { userId: 'friend', connected: false },
+          ]),
+        );
+        render(createElement(OnlineTeamBar));
+        const button = screen.getByRole('button', { name: /Free Player 2's seat/ });
+        expect(button).toBeDisabled();
+        expect(removableIn('friend')).toBeGreaterThan(0);
+
+        vi.setSystemTime(Date.now() + REJOIN_GRACE_MS + 1000);
+        expect(removableIn('friend')).toBe(0);
+        removeMember('friend');
+        expect(emitted.at(-1)).toEqual({ event: 'member:remove', payload: { userId: 'friend' } });
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it('a removed player keeps the design and continues solo', () => {
+      const { socket, fire } = fakeSocket();
+      useOnline.getState().set({ active: true, me: 'me', code: 'K7QX2M' });
+      attach(socket, 'K7QX2M');
+      fire(
+        'room:state',
+        snap('boss', [
+          { userId: 'boss', connected: true },
+          { userId: 'me', connected: true },
+        ]),
+      );
+      fire('room:left', { reason: 'removed' });
+      expect(useOnline.getState().active).toBe(false);
+      expect(useGame.getState().design).toEqual(design);
+      expect(useGame.getState().players[0]?.roles).toHaveLength(4);
+      expect(useGame.getState().notice).toMatch(/freed your seat/);
+    });
+
+    it('leaving tells the server first, so the seat frees at once', () => {
+      const { socket, emitted } = fakeSocket();
+      useOnline.getState().set({ active: true, me: 'me', code: 'K7QX2M' });
+      attach(socket, 'K7QX2M');
+      leaveRoom();
+      expect(emitted.at(-1)).toEqual({ event: 'room:leave', payload: {} });
+      expect(useOnline.getState().active).toBe(false);
+    });
   });
 });

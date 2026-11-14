@@ -1,16 +1,23 @@
 import type { MissionResult } from '@gravity/engine';
 import {
-  type Design,
+  type DesignAppliedEvent,
   type DesignEdit,
+  type DesignRejectedEvent,
   type Difficulty,
+  type ProposalUpdateEvent,
   type Role,
+  type RoomErrorEvent,
+  type RoomLeftEvent,
+  type RoomSnapshot,
+  type VoteUpdateEvent,
   PROPOSAL_MESSAGES,
+  REJOIN_GRACE_SECONDS,
   ROLES,
   editOwner,
 } from '@gravity/shared';
 import { io } from 'socket.io-client';
-import { registerRemote, useGame, type Vote } from '../store/game.ts';
-import { type OnlineMember, type OnlineProposal, myMember, useOnline } from '../store/online.ts';
+import { registerRemote, useGame } from '../store/game.ts';
+import { myMember, playerLabel, useOnline } from '../store/online.ts';
 import { API_BASE, createRoom, guestSession } from './api.ts';
 
 /** Minimal socket surface we use, so tests can pass a fake. */
@@ -31,18 +38,27 @@ const defaultFactory: SocketFactory = (url, token) =>
 let socket: RoomSocket | null = null;
 let lastCode: string | null = null;
 
-interface RoomSnapshot {
-  roomId: string;
-  code: string;
-  hostId: string;
-  status: 'lobby' | 'design' | 'simulating' | 'report';
-  design: Design;
-  version: number;
-  members: OnlineMember[];
-  proposals: OnlineProposal[];
+/** Milliseconds a disconnected player keeps their seat before the host may remove them. */
+export const REJOIN_GRACE_MS = REJOIN_GRACE_SECONDS * 1000;
+
+/** Seconds left before the host may remove an offline player (0 = removable now). */
+export function removableIn(userId: string, now = Date.now()): number {
+  const since = useOnline.getState().offlineSince[userId];
+  if (since === undefined) return Infinity;
+  return Math.max(0, Math.ceil((REJOIN_GRACE_MS - (now - since)) / 1000));
 }
 
 function applySnapshot(s: RoomSnapshot) {
+  const before = useOnline.getState();
+  const now = Date.now();
+  // Track how long each player has been offline (the server sends only a flag).
+  const offlineSince: Record<string, number> = {};
+  for (const m of s.members) {
+    if (!m.connected) offlineSince[m.userId] = before.offlineSince[m.userId] ?? now;
+  }
+  const left = before.members.filter((m) => !s.members.some((n) => n.userId === m.userId));
+  const hostChanged = before.hostId !== null && before.hostId !== s.hostId;
+
   useOnline.getState().set({
     roomId: s.roomId,
     code: s.code,
@@ -51,7 +67,23 @@ function applySnapshot(s: RoomSnapshot) {
     version: s.version,
     members: s.members,
     proposals: s.proposals,
+    offlineSince,
   });
+
+  const after = useOnline.getState();
+  const notices: string[] = [];
+  for (const m of left) {
+    notices.push(`${playerLabel(before, m.userId)} left the room; their roles are free to claim.`);
+  }
+  if (hostChanged) {
+    notices.push(
+      s.hostId === after.me
+        ? 'You are now the room host: you start the launch and can free the seat of a player who has gone.'
+        : `${playerLabel(after, s.hostId)} is now the room host.`,
+    );
+  }
+  if (notices.length) useGame.setState({ notice: notices.join(' ') });
+
   const game = useGame.getState();
   if (!game.design || game.design !== s.design) useGame.setState({ design: s.design });
   if (game.screen === 'home' && (s.status === 'lobby' || s.status === 'design')) {
@@ -73,22 +105,27 @@ export function attach(s: RoomSocket, code: string) {
   s.on('disconnect', () => online().set({ status: 'disconnected' }));
   s.on('connect_error', (e: Error) => online().set({ status: 'error', error: e.message }));
   s.on('room:state', (snap: RoomSnapshot) => applySnapshot(snap));
-  s.on('design:applied', (p: { design: Design; version: number }) => {
+  s.on('room:left', (p: RoomLeftEvent) => {
+    // We asked to leave: leaveRoom() already tidied up.
+    if (p.reason !== 'removed') return;
+    leaveKeepingDesign(false);
+    notice(
+      'The host freed your seat because you were offline for a while. Your design is kept, so you can carry on solo or join the room again with its code.',
+    );
+  });
+  s.on('design:applied', (p: DesignAppliedEvent) => {
     online().set({ version: p.version });
     useGame.setState({ design: p.design, notice: null });
   });
-  s.on('design:rejected', (p: { title: string; reason: string; latestVersion: number }) => {
+  s.on('design:rejected', (p: DesignRejectedEvent) => {
     online().set({ version: p.latestVersion });
     notice(`${p.title}: ${p.reason}`);
   });
-  s.on(
-    'proposal:update',
-    (p: { proposal: OnlineProposal; status: 'open' | 'accepted' | 'rejected' }) => {
-      const rest = online().proposals.filter((x) => x.id !== p.proposal.id);
-      online().set({ proposals: p.status === 'open' ? [...rest, p.proposal] : rest });
-    },
-  );
-  s.on('vote:update', (p: { votes: { userId: string; vote: Vote | null }[] }) => {
+  s.on('proposal:update', (p: ProposalUpdateEvent) => {
+    const rest = online().proposals.filter((x) => x.id !== p.proposal.id);
+    online().set({ proposals: p.status === 'open' ? [...rest, p.proposal] : rest });
+  });
+  s.on('vote:update', (p: VoteUpdateEvent) => {
     const votes = new Map(p.votes.map((v) => [v.userId, v.vote]));
     online().set({
       members: online().members.map((m) => ({ ...m, vote: votes.get(m.userId) ?? null })),
@@ -99,7 +136,7 @@ export function attach(s: RoomSocket, code: string) {
     useGame.setState({ result, screen: 'flight', notice: null });
     useGame.getState().recordRun(result);
   });
-  s.on('room:error', (p: { title: string; detail: string }) => notice(`${p.title}: ${p.detail}`));
+  s.on('room:error', (p: RoomErrorEvent) => notice(`${p.title}: ${p.detail}`));
 }
 
 async function connect(code: string, factory: SocketFactory) {
@@ -137,12 +174,23 @@ export async function joinRoom(code: string, factory = defaultFactory) {
   }
 }
 
-export function leaveRoom() {
+/** Close the connection; tell the server first when leaving for good, so the seat and roles free up at once. */
+function closeSocket(sayLeave: boolean) {
+  if (sayLeave) socket?.emit('room:leave', {});
   socket?.disconnect();
   socket = null;
   lastCode = null;
   useOnline.getState().reset();
+}
+
+export function leaveRoom() {
+  closeSocket(true);
   useGame.setState({ screen: 'home', notice: null });
+}
+
+/** Host only: free the seat of a player who has been offline past the grace period. */
+export function removeMember(userId: string) {
+  socket?.emit('member:remove', { userId });
 }
 
 /** Send an edit: directly if this player owns it, otherwise as a proposal to the owner. */
@@ -161,11 +209,8 @@ export function sendEdit(edit: DesignEdit) {
 }
 
 /** Leave the room but keep its design, so the player can iterate solo with all four roles. */
-function leaveKeepingDesign() {
-  socket?.disconnect();
-  socket = null;
-  lastCode = null;
-  useOnline.getState().reset();
+function leaveKeepingDesign(sayLeave = true) {
+  closeSocket(sayLeave);
   useGame.setState({
     players: [{ name: 'Player 1', roles: [...ROLES] }],
     activePlayer: 0,
@@ -180,7 +225,7 @@ registerRemote({
   vote: (vote) => socket?.emit('vote:cast', vote),
   respond: (proposalId, accept) => socket?.emit('proposal:respond', { proposalId, accept }),
   launch: () => socket?.emit('sim:start'),
-  leaveKeepingDesign,
+  leaveKeepingDesign: () => leaveKeepingDesign(true),
 });
 
 export const claimRoles = (roles: Role[]) => socket?.emit('role:claim', { roles });

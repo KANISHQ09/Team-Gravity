@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ROLE_INFO, ROLES, type Role } from '@gravity/shared';
 import { Button, StatusBadge } from '../../components/ui.tsx';
-import { claimRoles, leaveRoom } from '../../lib/realtime.ts';
+import { claimRoles, leaveRoom, removableIn, removeMember } from '../../lib/realtime.ts';
 import { useGame } from '../../store/game.ts';
 import { myMember, playerLabel, useOnline } from '../../store/online.ts';
 import { describeEdit } from './describeEdit.ts';
@@ -15,6 +15,16 @@ export function OnlineTeamBar() {
   const holder = (role: Role) => o.members.find((m) => m.roles.includes(role));
   const mine = o.proposals.filter((p) => me?.roles.includes(p.owner));
   const unclaimed = ROLES.filter((r) => !holder(r));
+  const iAmHost = !!me && o.hostId === me.userId;
+  const someoneOffline = o.members.some((m) => !m.connected);
+
+  // Tick once a second while someone is offline, for the "can remove in" countdown.
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!someoneOffline) return;
+    const id = window.setInterval(() => setTick((t) => t + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [someoneOffline]);
 
   const toggle = (role: Role) => {
     if (!me) return;
@@ -57,16 +67,48 @@ export function OnlineTeamBar() {
         </div>
       </div>
 
+      <p className="text-sm text-slate-300">
+        {iAmHost
+          ? 'You are the host: you start the launch, and you can free the seat of a player who has been offline for 2 minutes.'
+          : `${o.hostId ? playerLabel(o, o.hostId) : 'The host'} starts the launch. If the host is offline for 2 minutes, the next player online becomes host automatically.`}
+      </p>
+
       <ul className="grid gap-2 sm:grid-cols-2">
-        {o.members.map((m) => (
-          <li key={m.userId} className="rounded-md border border-slate-700 p-2 text-sm">
-            <span className="font-medium">{playerLabel(o, m.userId)}</span>
-            {!m.connected && <span className="ml-2 text-xs text-amber-200">offline</span>}
-            <span className="block text-xs text-slate-300">
-              {m.roles.length ? m.roles.map((r) => ROLE_INFO[r].name).join(' + ') : 'No role yet'}
-            </span>
-          </li>
-        ))}
+        {o.members.map((m) => {
+          const wait = removableIn(m.userId);
+          return (
+            <li key={m.userId} className="space-y-1 rounded-md border border-slate-700 p-2 text-sm">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-medium">{playerLabel(o, m.userId)}</span>
+                {m.connected ? (
+                  <StatusBadge status="green" label="Online" />
+                ) : (
+                  <StatusBadge status="yellow" label="Offline" />
+                )}
+              </div>
+              <span className="block text-xs text-slate-300">
+                {m.roles.length ? m.roles.map((r) => ROLE_INFO[r].name).join(' + ') : 'No role yet'}
+              </span>
+              {iAmHost && !m.connected && m.userId !== me?.userId && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="danger"
+                    disabled={wait > 0}
+                    aria-describedby={`remove-${m.userId}-hint`}
+                    onClick={() => removeMember(m.userId)}
+                  >
+                    Free {playerLabel(o, m.userId).split(' (')[0]}'s seat
+                  </Button>
+                  <span id={`remove-${m.userId}-hint`} className="text-xs text-slate-400">
+                    {wait > 0
+                      ? `Possible in ${Math.floor(wait / 60)}:${String(wait % 60).padStart(2, '0')}, in case they reconnect.`
+                      : 'Their roles become free for others to claim.'}
+                  </span>
+                </div>
+              )}
+            </li>
+          );
+        })}
       </ul>
 
       {me && (
