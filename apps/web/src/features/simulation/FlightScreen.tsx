@@ -137,21 +137,22 @@ export function FlightScreen() {
 
   useEffect(() => {
     if (!playing || day >= endDay || gameOn || !timeline) return;
+    // The effect re-runs whenever `day` changes, so `day` here is always current.
+    // Side effects stay out of the state updater (React may call updaters twice).
     const id = window.setInterval(() => {
-      setDay((d) => {
-        const next = Math.min(endDay, d + flightRate(d, timeline, speed, cinematic) / 10);
-        // Stop at the next mini-game.
-        const i = checkpoints.findIndex(
-          (c, k) => !done.current.has(k) && c.day >= d && c.day <= next,
-        );
-        if (i >= 0) {
-          done.current.add(i);
-          sim.game = checkpoints[i]!.make();
-          setGameOn(true);
-          return checkpoints[i]!.day;
-        }
-        return next;
-      });
+      const next = Math.min(endDay, day + flightRate(day, timeline, speed, cinematic) / 10);
+      // Stop at the next mini-game, even if one tick would jump past it.
+      const i = checkpoints.findIndex(
+        (c, k) => !done.current.has(k) && c.day >= day && c.day <= next,
+      );
+      if (i >= 0) {
+        done.current.add(i);
+        sim.game = checkpoints[i]!.make();
+        setGameOn(true);
+        setDay(checkpoints[i]!.day);
+        return;
+      }
+      setDay(next);
     }, 100);
     return () => window.clearInterval(id);
   }, [playing, speed, day, endDay, gameOn, checkpoints, cinematic, sim, timeline]);
@@ -219,7 +220,8 @@ export function FlightScreen() {
   const finished = day >= endDay && !gameOn;
   const science = finished ? run.science : (sample?.science ?? 0);
   const progress = Math.max(0, Math.min(1, day / totalDays));
-  const caption = shotAt(day, timeline).caption;
+  // While a mini-game runs, the caption names it instead of the clock's phase.
+  const caption = gameOn && sim.game ? sim.game.label : shotAt(day, timeline).caption;
 
   const skip = () => {
     if (sim.game) finishGame(true);

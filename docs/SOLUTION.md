@@ -231,7 +231,7 @@ We use concepts and facts in our own words. We do not copy NASA images or logos,
 
 1. **(0:00)** Home screen: three missions, three difficulties, solo or online.
 2. **(0:20)** CubeSat Earth Observer, Explorer level: pick goals and a sun-synchronous orbit with a rideshare launch.
-3. **(0:50)** Design stage: add a camera and watch the Data gauge turn red. Add a better antenna or a second ground station and watch it recover.
+3. **(0:50)** Design stage: with the UHF antenna, add the two cameras and watch the Communications gauge turn red (more data than the radio can send). Add the S-band patch antenna and watch it recover; the 3D hangar builds the CubeSat as you go.
 4. **(1:30)** Build & Verify: the readiness checklist and risk matrix, then "What matters most?" ranks the next change.
 5. **(1:50)** GO vote, launch, and the mission flies through its six phases, with an event that a margin softens.
 6. **(2:20)** Report: score breakdown, "because you chose…" statements, the closest real NASA mission, and the trade-space chart after a second run.

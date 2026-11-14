@@ -1,10 +1,17 @@
-import type { Analog, Catalog, DesignEdit, Measurement } from '@gravity/shared';
+import {
+  type Analog,
+  type Catalog,
+  type DesignEdit,
+  type Measurement,
+  applyEdit,
+} from '@gravity/shared';
 import { gaugesFromAnalysis } from '../budgets/index.ts';
 import { type DesignAnalysis, analyzeDesign } from '../models/analysis.ts';
 import { DIFFICULTY_MULTIPLIER } from '../models/constants.ts';
 import { readinessFromAnalysis } from '../readiness/index.ts';
 import { mitigationFacts } from '../readiness/risk.ts';
 import type { LossCause, RunResult } from '../simulate/index.ts';
+import { hasBlockingErrors, validateAnalysis } from '../validate/index.ts';
 
 /** Co-op facts that feed the collaboration score. Omit for solo play. */
 export interface TeamInfo {
@@ -207,6 +214,41 @@ function buildSuggestions(run: RunResult, a: DesignAnalysis, catalog: Catalog): 
     .sort((x, y) => y[1] - x[1])
     .map(([c]) => c);
   const has = (id: string) => parts.some((p) => p.id === id);
+  // A one-click suggestion must never make a launchable design unlaunchable
+  // (e.g. 18 kg of reaction wheels on a CubeSat rideshare).
+  const launchableNow = !hasBlockingErrors(validateAnalysis(a));
+  const keepsLaunchable = (edit: DesignEdit) =>
+    !launchableNow ||
+    !hasBlockingErrors(validateAnalysis(analyzeDesign(applyEdit(design, edit), catalog)));
+  /** First part from a best-first list that is allowed, not fitted yet, and keeps the design launchable. */
+  const firstFitting = (ids: readonly string[]) =>
+    ids
+      .map((id) => catalog.parts.find((p) => p.id === id))
+      .find(
+        (p) =>
+          !!p &&
+          !has(p.id) &&
+          !(p.advanced && design.difficulty === 'explorer') &&
+          keepsLaunchable({ type: 'addPart', partId: p.id, category: p.category }),
+      );
+  const pointingFix = () => {
+    const p = firstFitting(['adcs-wheels-redundant', 'adcs-wheels', 'adcs-cube-wheels']);
+    return p
+      ? {
+          text: `Fit ${p.name.toLowerCase()} to keep pointing precise.`,
+          edit: { type: 'addPart', partId: p.id, category: p.category } as const,
+        }
+      : { text: 'Sharper pointing needs reaction wheels: free up some mass first, then add them.' };
+  };
+  const computerFix = (why: string) => {
+    const p = firstFitting(['computer-radhard', 'computer-cube-radtol']);
+    return p
+      ? {
+          text: `Fit the ${p.name.toLowerCase()} (${p.storageGbit} Gbit recorder) ${why}.`,
+          edit: { type: 'addPart', partId: p.id, category: p.category } as const,
+        }
+      : { text: `A tougher computer would help ${why}; free up mass or budget first.` };
+  };
   for (const cause of top) {
     if (cause === 'downlink' && design.groundStations < 3) {
       out.push({
@@ -214,24 +256,15 @@ function buildSuggestions(run: RunResult, a: DesignAnalysis, catalog: Catalog): 
         edit: { type: 'setGroundStations', count: design.groundStations + 1 },
       });
     } else if (cause === 'storage' && !has('computer-radhard')) {
-      out.push({
-        text: 'Fit the radiation-hardened computer: it has a 512 Gbit recorder.',
-        edit: { type: 'addPart', partId: 'computer-radhard', category: 'computer' },
-      });
+      out.push(computerFix('so the recorder does not overflow'));
     } else if (cause === 'power') {
       out.push({ text: 'Add a larger solar array so instruments can run all the time.' });
     } else if (cause === 'battery') {
       out.push({ text: 'Add battery capacity to ride through eclipses and battery wear.' });
     } else if (cause === 'safe-mode' && !has('computer-radhard')) {
-      out.push({
-        text: 'Use the radiation-hardened computer so solar storms cannot crash it.',
-        edit: { type: 'addPart', partId: 'computer-radhard', category: 'computer' },
-      });
+      out.push(computerFix('so solar storms cannot crash it'));
     } else if (cause === 'pointing' && !has('adcs-wheels-redundant')) {
-      out.push({
-        text: 'Use reaction wheels with a spare to keep pointing precise.',
-        edit: { type: 'addPart', partId: 'adcs-wheels-redundant', category: 'adcs' },
-      });
+      out.push(pointingFix());
     } else if (cause === 'orbit-mapping') {
       const best = catalog.orbits
         .filter((o) => scenario.allowedOrbitIds.includes(o.id))
@@ -273,12 +306,14 @@ function buildSuggestions(run: RunResult, a: DesignAnalysis, catalog: Catalog): 
   }
   const m = mitigationFacts(a);
   if (out.length === 0 && !m.redundantWheels) {
-    out.push({
-      text: 'Your mission went well. For more safety, try reaction wheels with a spare.',
-      edit: { type: 'addPart', partId: 'adcs-wheels-redundant', category: 'adcs' },
-    });
+    const fix = pointingFix();
+    if ('edit' in fix)
+      out.push({ ...fix, text: `Your mission went well. For more safety: ${fix.text}` });
   }
-  return out.slice(0, 5);
+  // Orbit and ground-station edits can also break a design (Δv, mass); drop the button, keep the advice.
+  return out
+    .slice(0, 5)
+    .map((sg) => (sg.edit && !keepsLaunchable(sg.edit) ? { text: sg.text } : sg));
 }
 
 /** Real NASA missions with similar targets and measurements (SRS-ANA-01). */
