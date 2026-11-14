@@ -1,21 +1,9 @@
-import type { DesignEdit, Role } from '@gravity/shared';
+import type { ProposalView, RoomMemberView, RoomStatus } from '@gravity/shared';
 import { create } from 'zustand';
-import type { Vote } from './game.ts';
 
-export interface OnlineMember {
-  readonly userId: string;
-  readonly roles: readonly Role[];
-  readonly vote: Vote | null;
-  readonly connected: boolean;
-}
-
-export interface OnlineProposal {
-  readonly id: string;
-  readonly from: string;
-  readonly edit: DesignEdit;
-  readonly owner: Role;
-  readonly message: string;
-}
+/** Same shapes as the server sends (packages/shared/src/realtime.ts). */
+export type OnlineMember = RoomMemberView;
+export type OnlineProposal = ProposalView;
 
 export type OnlineStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'error';
 
@@ -27,10 +15,12 @@ interface OnlineState {
   roomId: string | null;
   me: string | null;
   hostId: string | null;
-  roomStatus: 'lobby' | 'design' | 'simulating' | 'report';
+  roomStatus: RoomStatus;
   version: number;
   members: OnlineMember[];
   proposals: OnlineProposal[];
+  /** When (ms, this device's clock) each offline player was first seen offline. */
+  offlineSince: Record<string, number>;
   error: string | null;
   set(partial: Partial<Omit<OnlineState, 'set' | 'reset'>>): void;
   reset(): void;
@@ -43,10 +33,11 @@ const initial = {
   roomId: null,
   me: null,
   hostId: null,
-  roomStatus: 'lobby' as const,
+  roomStatus: 'lobby' as RoomStatus,
   version: 0,
   members: [] as OnlineMember[],
   proposals: [] as OnlineProposal[],
+  offlineSince: {} as Record<string, number>,
   error: null,
 };
 

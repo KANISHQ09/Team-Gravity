@@ -21,13 +21,12 @@
 
 **In the MVP:** every Must requirement except the items listed as follow-ups below.
 
-**Phase 9 (`feature/phase-9-polish`) built these follow-ups:** web lobby for online rooms (create/join by code, role claims, live design sync, proposals, GO/NO-GO, shared launch); engine in a Web Worker; offline play (PWA, installable); trade-space chart and "What matters most?" sensitivity view; balance fix so every mission is winnable at every difficulty (35% margins apply to physical resources, plus a rad-tolerant CubeSat computer); axe-core accessibility tests on every screen; per-screen page titles and app icon; [docs/SOLUTION.md](SOLUTION.md) describing the whole game; landing page with a video hero; **3D spacecraft hangar** (inspect, X-ray, deployment test) and **3D flight** with four playable mini-games (launch steering, orbit insertion, science + downlink, anomaly response) feeding a separate pilot rating.
+**Phase 9 (`feature/phase-9-polish`) built these follow-ups:** web lobby for online rooms (create/join by code, role claims, live design sync, proposals, GO/NO-GO, shared launch); engine in a Web Worker; offline play (PWA, installable); trade-space chart and "What matters most?" sensitivity view; balance fix so every mission is winnable at every difficulty (35% margins apply to physical resources, plus a rad-tolerant CubeSat computer); axe-core accessibility tests on every screen; per-screen page titles and app icon; [docs/SOLUTION.md](SOLUTION.md) describing the whole game; web lobby follows the room lifecycle (leave frees your seat at once, host handover notices, host can free the seat of a player offline for 2 minutes, removed players keep their design); landing page with a video hero; **3D spacecraft hangar** (inspect, X-ray, deployment test) and **3D flight** with four playable mini-games (launch steering, orbit insertion, science + downlink, anomaly response) feeding a separate pilot rating.
 
 **Still open:**
 
 | Item | Why | Requirement |
 | --- | --- | --- |
-| Web client for leave / remove / host-handover events | The server and the typed contract (`packages/shared/src/realtime.ts`) support them since `feature/server-realtime-contract`; the web lobby still offers only join and leave | FR-13b |
 | BullMQ jobs | Rooms expire through Redis TTLs and an in-process sweep, so no queue is needed yet. (Redis room state, the Socket.IO Redis adapter, leave/remove/host handover and the Postgres room archive were added on `feature/server-realtime-contract`.) | SRS-REL-03/04 |
 | i18n (i18next), Radix UI, Recharts, Dexie | Native HTML, SVG and localStorage cover the MVP with fewer dependencies | TECH_STACK |
 | GMAT-generated trajectories in the 3D flight | Stretch item; the 3D flight uses schematic distances today | SRS-VIZ-02 |
