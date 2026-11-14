@@ -9,11 +9,20 @@
 # Default reviewer for anything not listed below
 *                       @KANISHQ09
 
+# Documentation: owned by the whole team, so whoever opens a docs PR,
+# the other two are asked to review (GitHub never asks the PR author).
+/docs/                  @KANISHQ09 @madhavansingh @dimcodes09
+/resources/             @KANISHQ09 @madhavansingh @dimcodes09
+/README.md              @KANISHQ09 @madhavansingh @dimcodes09
+/CONTRIBUTING.md        @KANISHQ09 @madhavansingh @dimcodes09
+/SECURITY.md            @KANISHQ09 @madhavansingh @dimcodes09
+/CODE_OF_CONDUCT.md     @KANISHQ09 @madhavansingh @dimcodes09
+/LICENSE                @KANISHQ09 @madhavansingh @dimcodes09
+
 # Engine, game data and tools (Tech lead)
 /packages/engine/       @KANISHQ09
 /packages/catalog/      @KANISHQ09
 /tools/                 @KANISHQ09
-/docs/DATA_LEDGER.md    @KANISHQ09
 
 # Frontend (Frontend + design)
 /apps/web/              @madhavansingh
