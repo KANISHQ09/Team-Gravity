@@ -73,7 +73,9 @@ function applySnapshot(s: RoomSnapshot) {
   const after = useOnline.getState();
   const notices: string[] = [];
   for (const m of left) {
-    notices.push(`${playerLabel(before, m.userId)} left the room; their roles are free to claim.`);
+    notices.push(
+      `${playerLabel(before, m.userId).replace(' · host', '')} left the room; their roles are free to claim.`,
+    );
   }
   if (hostChanged) {
     notices.push(

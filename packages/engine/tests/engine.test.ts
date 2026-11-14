@@ -1,4 +1,4 @@
-import { designEditSchema, emptyDesign } from '@gravity/shared';
+import { applyEdit, designEditSchema, emptyDesign } from '@gravity/shared';
 import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
@@ -328,4 +328,62 @@ describe('every scenario is winnable at every difficulty', () => {
       });
     }
   }
+});
+
+describe('"Try changing…" suggestions (SRS-SCR-05)', () => {
+  const launchable = (d: Parameters<typeof validate>[0]) =>
+    !validate(d, catalog).some((i) => i.severity === 'error');
+
+  it('never offer a one-click change that blocks a launchable design', () => {
+    // The CubeSat from the demo: magnetorquers only, rideshare launch with little spare mass.
+    const demoCubesat = design(
+      'cubesat-earth-observer',
+      'explorer',
+      [
+        'bus-cubesat-6u',
+        'solar-cube-deploy',
+        'battery-cube',
+        'antenna-sband-patch',
+        'computer-cots',
+        'adcs-magnetorquer',
+        'inst-multispectral-cube',
+        'inst-camera-cube',
+      ],
+      'sso-550',
+      'lv-rideshare',
+      {},
+      ['eo-land', 'eo-coast'],
+    );
+    expect(launchable(demoCubesat)).toBe(true);
+    for (const d of [demoCubesat, ...allDesigns]) {
+      for (const seed of [1, 7, 42, 99, 1234]) {
+        for (const sg of runMission(d, seed).report.suggestions) {
+          if (sg.edit) expect(launchable(applyEdit(d, sg.edit)), sg.text).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('suggests CubeSat-sized wheels when pointing is too rough on a CubeSat', () => {
+    const d = design(
+      'cubesat-earth-observer',
+      'explorer',
+      [
+        'bus-cubesat-6u',
+        'solar-cube-deploy',
+        'battery-cube',
+        'antenna-sband-patch',
+        'computer-cots',
+        'adcs-magnetorquer',
+        'inst-multispectral-cube',
+        'inst-camera-cube',
+      ],
+      'sso-550',
+      'lv-rideshare',
+      {},
+      ['eo-land', 'eo-coast'],
+    );
+    const edits = runMission(d, 1).report.suggestions.flatMap((s) => (s.edit ? [s.edit] : []));
+    expect(edits).toContainEqual({ type: 'addPart', partId: 'adcs-cube-wheels', category: 'adcs' });
+  });
 });

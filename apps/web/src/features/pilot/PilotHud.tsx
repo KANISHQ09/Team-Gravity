@@ -125,7 +125,7 @@ const BRIEF: Record<ActiveGame['type'], { controls: string[] }> = {
   insertion: {
     controls: [
       'Hold SPACE (or the Burn button) to fire the engine.',
-      'Burn near the closest point to the planet. Watch the predicted path: orange means escape, cyan means orbit. Stop when it matches the green circle.',
+      'Burn backwards near the closest point to the planet. Watch the predicted path: orange means escape, cyan means orbit. Stop when it matches the green circle.',
     ],
   },
   science: {
@@ -161,7 +161,12 @@ export function PilotHud({ sim, onStart }: { sim: FlightSim; onStart: (auto: boo
               g.info.instruction,
               `Press SPACE (or the button) to ${g.info.action.toLowerCase()} at the right moment.`,
             ]
-        : BRIEF[g.type].controls;
+        : g.type === 'insertion' && g.s.kind === 'circularize'
+          ? [
+              'Hold SPACE (or the Burn button) to fire the engine forwards.',
+              'You are coasting up to the highest point of a low, stretched orbit. Burn there to lift the low side until the predicted path matches the green circle.',
+            ]
+          : BRIEF[g.type].controls;
     return (
       <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-black/40 p-4">
         <div

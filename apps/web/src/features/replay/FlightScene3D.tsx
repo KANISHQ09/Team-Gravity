@@ -501,7 +501,11 @@ function FlightWorld(props: FlightScene3DProps) {
       if (!sg) {
         S.craftAngle += omega * dt;
         S.sciBase = null;
-      } else S.sciBase ??= S.craftAngle;
+      } else if (S.sciBase === null) {
+        // Start the science pass just before the point under the Sun, so the targets are in daylight.
+        const sunA = Math.atan2(SUN_DIR.dot(b.v), SUN_DIR.dot(b.u));
+        S.sciBase = sunA - 0.9;
+      }
       const scienceBase = S.sciBase ?? S.craftAngle;
       const angle = sg ? scienceBase + sg.track * 0.5 : S.craftAngle;
       if (sg) S.craftAngle = angle;
