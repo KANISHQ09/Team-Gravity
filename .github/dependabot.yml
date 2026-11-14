@@ -35,6 +35,10 @@ updates:
         update-types: [version-update:semver-major]
       - dependency-name: typescript
         update-types: [version-update:semver-major, version-update:semver-minor]
+      # Node type definitions must match the Node.js runtime major (22, see .nvmrc).
+      # Bump together with .nvmrc and package.json "engines" when moving Node versions.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /

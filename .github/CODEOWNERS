@@ -1,22 +1,29 @@
-# CODEOWNERS: requests reviews automatically when a PR touches these paths.
-# Later matching lines take precedence. Add each team member's GitHub
-# username next to the areas they own (see docs/RESOURCE_PLAN.md §5).
+# CODEOWNERS: GitHub automatically requests a review from the owner of the
+# paths a PR touches. Later matching lines take precedence.
+# Team and roles: docs/RESOURCE_PLAN.md §5.
+#
+#   @KANISHQ09      Tech lead: engine, catalog, data, tools, repo rules
+#   @madhavansingh  Frontend + design: apps/web
+#   @dimcodes09     Backend + realtime: apps/server, packages/shared
 
-# Default owner for everything
+# Default reviewer for anything not listed below
 *                       @KANISHQ09
 
-# Engine and data (Tech lead / Engine, Science and QA)
+# Engine, game data and tools (Tech lead)
 /packages/engine/       @KANISHQ09
 /packages/catalog/      @KANISHQ09
 /tools/                 @KANISHQ09
+/docs/DATA_LEDGER.md    @KANISHQ09
 
-# Frontend (Frontend lead, Design and content)
-/apps/web/              @KANISHQ09
+# Frontend (Frontend + design)
+/apps/web/              @madhavansingh
 
-# Backend and realtime (Backend / Realtime)
-/apps/server/           @KANISHQ09
-/packages/shared/       @KANISHQ09
+# Backend, realtime and the web/server contract (Backend + realtime)
+/apps/server/           @dimcodes09
+/packages/shared/       @dimcodes09
+/docker-compose.yml     @dimcodes09
 
-# Repository rules and CI
+# Repository rules, CI and AI-assistant config (Tech lead)
 /.github/               @KANISHQ09
+/.claude/               @KANISHQ09
 /CLAUDE.md              @KANISHQ09

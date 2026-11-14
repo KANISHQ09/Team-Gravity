@@ -17,7 +17,7 @@ The simulation engine has to run **in the browser** (offline solo play) **and on
 | `backend/src/controllers`, `routes`, `models`, `services` | `apps/server/src/modules/<feature>/` (route, service, repository together per feature) |
 | `frontend/src/pages`, `components`, `hooks`, `services` | `apps/web/src/features/<feature>/` + shared `components/`, `hooks/`, `lib/` |
 
-Grouping by **feature** (rooms, scores, studio, report) rather than by file type keeps related code together and makes ownership clear in a team of 4–5.
+Grouping by **feature** (rooms, scores, studio, report) rather than by file type keeps related code together and makes ownership clear (see the team table in [RESOURCE_PLAN.md §5](RESOURCE_PLAN.md#5-people-team-of-3)).
 
 ## 2. Proposed tree
 

@@ -45,7 +45,7 @@ Examples: `feat(engine): add power budget with eclipse fraction` · `fix(studio)
 1. Push your branch and open a PR against **`main`**.
 2. Fill in the [PR template](.github/PULL_REQUEST_TEMPLATE.md) completely.
 3. CI must pass: the **CI** workflow (lint, format, type-check, tests, build, dependency audit) and **CodeQL** run on every PR.
-4. Get at least **one approval** from another team member. During the hackathon a verbal "ship it" on the team call is acceptable; note it in the PR.
+4. Get at least **one approval** from another team member. GitHub requests a review from the area's owner automatically ([`.github/CODEOWNERS`](.github/CODEOWNERS); team roles in [docs/RESOURCE_PLAN.md §5](docs/RESOURCE_PLAN.md#5-people-team-of-3)). During the hackathon a verbal "ship it" on the team call is acceptable; note it in the PR.
 5. A team member **squash-merges**; the branch is then deleted.
 
 PR size: aim for under ~400 changed lines. Split larger work.

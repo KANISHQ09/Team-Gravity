@@ -72,12 +72,14 @@ Every source is recorded in `docs/DATA_LEDGER.md` (created in Phase 4) with colu
 
 Account sign-ups are for a team member to do; Claude does not create accounts or handle credentials.
 
-## 5. People (team of 4–5)
+## 5. People (team of 3)
 
-| Role | Owns |
-| --- | --- |
-| Tech lead / Engine | `packages/engine`, simulation, scoring, balance script |
-| Frontend lead | Studio, gauges, simulation view, report, accessibility |
-| Backend / Realtime | Room server, deployment |
-| Design and content | UX, visual style, tutorial, glossary, demo video |
-| Science and QA | Catalog data, data ledger, test plans, playtests |
+The original plan assumed 4–5 people; with three, the five roles merge into three (as `resources/Gravity.md` §4.11 suggests). Review ownership is enforced through [`.github/CODEOWNERS`](../.github/CODEOWNERS).
+
+| GitHub | Role | Owns |
+| --- | --- | --- |
+| @KANISHQ09 | **Tech lead + Engine + Science/QA** | `packages/engine` (simulation, scoring), `packages/catalog` (game data), `tools/` (balance script, GMAT), data ledger, test plans, playtests, repo rules and CI |
+| @madhavansingh | **Frontend + Design** | `apps/web`: studio, gauges, simulation view, report, accessibility, UX and visual style, tutorial, glossary |
+| @dimcodes09 | **Backend + Realtime** | `apps/server`, `packages/shared`: REST API, Socket.IO rooms, database and Redis, local services, deployment (when approved) |
+
+**Shared by everyone:** demo video and submission, playtests, and reviewing each other's PRs (one approval needed; with three people a reviewer is always available).
