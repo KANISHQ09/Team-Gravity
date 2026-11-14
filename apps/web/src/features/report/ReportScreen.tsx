@@ -290,7 +290,8 @@ function Leaderboard() {
   if (!onlineConfigured) {
     return (
       <p className="text-sm text-slate-400">
-        Leaderboard: offline (no server configured). Your mission and score stay on this device.
+        The online leaderboard is not switched on in this version. Your missions and scores stay on
+        this device.
       </p>
     );
   }

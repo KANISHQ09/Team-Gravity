@@ -18,8 +18,8 @@ export function OnlineLobby() {
   if (!onlineConfigured) {
     return (
       <p className="text-sm text-slate-400">
-        Online rooms are available when the game server is running (set <code>VITE_API_URL</code>).
-        Hot-seat team play on one device always works.
+        Online rooms are not switched on in this version of the game. You can still play as a team:
+        pick 2–4 players on a mission card and take turns on this device, each with their own role.
       </p>
     );
   }
