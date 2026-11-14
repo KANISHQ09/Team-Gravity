@@ -1,6 +1,13 @@
 # GRAVITY — API Documentation
 
-> Status: **📐 Planned contract, not implemented yet.** Once the server exists, the OpenAPI 3.1 spec generated from the Zod schemas in `packages/shared` becomes the source of truth and this page links to it. Based on [ARCHITECTURE](ARCHITECTURE.md) §6–7 and [`resources/Gravity.md`](../resources/Gravity.md) §2.7.
+> Status: **✅ Implemented in Phase 8** (`apps/server`), with request/response schemas in `packages/shared/src/api.ts`. Covered by `apps/server/tests`. Not yet implemented: OpenAPI generation, `Idempotency-Key`, and the post-MVP endpoints listed below.
+>
+> Implementation notes:
+> - Validation: top-level request bodies are strict (unknown fields → 400); unknown fields *inside* a design are dropped.
+> - The room-creation limit (5/hour) is counted per client IP, because rate limiting runs before authentication.
+> - `POST /simulate` and `POST /scores` return **422** with an `issues` array (`code`, `message`, `why`, `fix`) for designs that cannot launch.
+> - Socket errors arrive as `room:error` `{ event, title, detail }`; a rejected patch arrives as `design:rejected` `{ title, reason, latestVersion }`.
+> - Rooms are held in memory on one server instance and removed after 30 idle minutes.
 
 ## 1. Conventions
 
@@ -12,7 +19,7 @@
 | Validation | Every body is checked with Zod; **unknown fields are rejected** (400) |
 | Errors | [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457): `type`, `title`, `status`, `detail`, `instance`, plus `correlationId` |
 | Rate limits | 60 requests/min per IP; 5 room creations/hour per guest. Exceeding returns 429 with `Retry-After` |
-| Idempotency | `POST /scores` and `POST /rooms` accept an `Idempotency-Key` header |
+| Idempotency | Planned: `POST /scores` and `POST /rooms` will accept an `Idempotency-Key` header (not implemented yet) |
 | Versioning | Breaking changes get a new prefix (`/api/v2`) |
 
 ### Error example

@@ -1,0 +1,82 @@
+[
+  {
+    "term": "Δv (delta-v)",
+    "definition": "How much a spacecraft can change its speed with the fuel it carries. Every manoeuvre, such as braking into orbit around the Moon, costs some Δv."
+  },
+  {
+    "term": "Specific impulse (Isp)",
+    "definition": "How efficiently an engine uses fuel. Higher Isp means more Δv from the same amount of propellant."
+  },
+  {
+    "term": "Low Earth orbit (LEO)",
+    "definition": "An orbit a few hundred kilometres up. Close, cheap to reach and easy to talk to, but with frequent passes through Earth's shadow."
+  },
+  {
+    "term": "Sun-synchronous orbit (SSO)",
+    "definition": "A polar orbit that passes over each place at the same local time every day, so lighting stays consistent between images."
+  },
+  {
+    "term": "Geostationary orbit (GEO)",
+    "definition": "An orbit 35,786 km above the equator where a satellite turns with the Earth and seems to hover over one spot."
+  },
+  {
+    "term": "Eclipse",
+    "definition": "The part of an orbit spent in a planet's or moon's shadow. Solar panels produce nothing, so batteries must take over."
+  },
+  {
+    "term": "Margin",
+    "definition": "Spare capacity kept on purpose, such as extra power or mass the design does not use yet. Engineers keep margins because estimates grow as designs mature."
+  },
+  {
+    "term": "Bus",
+    "definition": "The spacecraft's body: structure, wiring and basic systems that carry and support the instruments."
+  },
+  {
+    "term": "Payload",
+    "definition": "The equipment a mission exists for, usually the science instruments."
+  },
+  {
+    "term": "Downlink",
+    "definition": "Sending data from the spacecraft to antennas on Earth. Limited by distance, antenna size, transmitter power and contact time."
+  },
+  {
+    "term": "Link margin",
+    "definition": "How much stronger a radio link is than the minimum needed, measured in decibels (dB). 3 dB means twice the minimum."
+  },
+  {
+    "term": "Data recorder",
+    "definition": "Onboard storage that holds science data until the next ground-station contact. If it fills up, new data is lost."
+  },
+  {
+    "term": "Radiation-hardened (rad-hard)",
+    "definition": "Electronics built to survive energetic particles from the Sun and deep space without errors or damage."
+  },
+  {
+    "term": "Reliability",
+    "definition": "The chance a part keeps working for a year. Spacecraft reliability is the product of all its parts, so weak parts matter."
+  },
+  {
+    "term": "ConOps (Concept of Operations)",
+    "definition": "A time-ordered description of what the mission does, from launch to end of life."
+  },
+  {
+    "term": "Science Traceability Matrix",
+    "definition": "A table linking each science goal to the measurement it needs, the instrument that makes it and the requirement that checks it."
+  },
+  {
+    "term": "Master Equipment List (MEL)",
+    "definition": "The list of every part on the spacecraft with its mass, power and cost."
+  },
+  {
+    "term": "Baseline and Threshold",
+    "definition": "Baseline is the science return for full success. Threshold is the minimum that still counts as partial success."
+  },
+  {
+    "term": "Concept Maturity Level (CML)",
+    "definition": "A JPL scale for how developed a mission idea is, from a sketch (CML 1) to a point design (CML 4). GRAVITY's difficulty levels follow it."
+  },
+  {
+    "term": "Launch period",
+    "definition": "The window of days in which a launch must happen to reach the target. Missing it can mean waiting months or years."
+  }
+]

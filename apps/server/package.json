@@ -13,16 +13,24 @@
     "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
+    "@fastify/cookie": "^11.1.5",
+    "@fastify/cors": "^11.4.3",
+    "@fastify/jwt": "^10.2.7",
+    "@fastify/rate-limit": "^11.2.2",
+    "@gravity/catalog": "workspace:*",
     "@gravity/engine": "workspace:*",
     "@gravity/shared": "workspace:*",
     "drizzle-orm": "^0.45.4",
     "fastify": "^5.12.8",
+    "ioredis": "^6.0.0",
     "postgres": "^4.1.1",
+    "socket.io": "^4.8.4",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
     "drizzle-kit": "^0.31.11",
+    "socket.io-client": "^4.8.4",
     "tsup": "^9.0.0",
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
