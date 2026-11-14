@@ -34,13 +34,14 @@ Team-Gravity/
 │   │   │   │   ├── studio/          # parts browser, gauges, 2D/3D craft view, launch + orbit picker
 │   │   │   │   ├── readiness/       # G/Y/R checklist, 5×5 risk matrix, launch gate
 │   │   │   │   ├── simulation/      # live dashboard, speed controls, decision modal
-│   │   │   │   ├── replay/          # 2D (and 3D) mission replay
+│   │   │   │   ├── replay/          # 2D replay and the 3D flight scene
+│   │   │   │   ├── pilot/           # playable flight mini-games (pure logic + HUD) and pilot rating
 │   │   │   │   ├── report/          # score breakdown, causal chains, suggestions, analogs
 │   │   │   │   ├── trade-space/     # trade-space chart, sensitivity view
 │   │   │   │   ├── rooms/           # lobby, roles, proposals, GO/NO-GO, hot-seat mode
 │   │   │   │   ├── leaderboard/
 │   │   │   │   └── education/       # tutorial, glossary, static facts panel, About page
-│   │   │   ├── components/          # shared UI built on Radix (Button, Dialog, Gauge…)
+│   │   │   ├── components/          # shared UI (Button, Gauge…); space3d/ = shared 3D planets, stars, spacecraft
 │   │   │   ├── hooks/               # shared React hooks
 │   │   │   ├── lib/                 # API client, socket client, design-code helpers
 │   │   │   ├── store/               # Zustand slices + Dexie (IndexedDB) persistence

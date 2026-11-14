@@ -98,3 +98,27 @@ describe('design codes (SRS-SAV-02)', () => {
     expect(decodeDesign('not-a-code')).toBeNull();
   });
 });
+
+describe('trade space and sensitivity (FR-19)', () => {
+  it('compares runs of the same scenario after a second launch', () => {
+    act(() => useGame.getState().loadDesign(lunar));
+    act(() => useGame.getState().launch());
+    act(() => useGame.getState().redesign({ type: 'setGroundStations', count: 2 }));
+    act(() => useGame.getState().launch());
+    act(() => useGame.getState().go('report'));
+    render(<App />);
+    expect(screen.getByRole('heading', { name: /Trade space/ })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Trade space with 2 runs/ })).toBeInTheDocument();
+    expect(screen.getByText('Run 2 (this run)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Load the design of Run 1' })).toBeInTheDocument();
+  });
+
+  it('ranks single changes on the Build & Verify stage and applies one', () => {
+    act(() => useGame.getState().loadDesign(lunar));
+    act(() => useGame.getState().setStage('verify'));
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Analyse my design' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Apply: Use 2 ground stations' }));
+    expect(useGame.getState().design?.groundStations).toBe(2);
+  });
+});

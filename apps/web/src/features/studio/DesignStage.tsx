@@ -4,6 +4,8 @@ import type { Mitigation, Part, PartCategory } from '@gravity/shared';
 import { Button, StatusBadge, Why } from '../../components/ui.tsx';
 import { useReview } from '../../hooks/useReview.ts';
 import { CATEGORY_LABEL, cx, fmt } from '../../lib/format.ts';
+import { useActingPlayer } from '../../hooks/useActingPlayer.ts';
+import { Hangar } from './Hangar.tsx';
 import { canEdit, useGame } from '../../store/game.ts';
 
 const CATEGORIES: PartCategory[] = [
@@ -59,7 +61,7 @@ export function DesignStage() {
   const data = useReview();
   const design = useGame((s) => s.design);
   const edit = useGame((s) => s.edit);
-  const player = useGame((s) => s.players[s.activePlayer]);
+  const player = useActingPlayer();
   const [category, setCategory] = useState<PartCategory>('bus');
   if (!data || !design) return null;
   const { review } = data;
@@ -82,6 +84,7 @@ export function DesignStage() {
 
   return (
     <div className="space-y-6">
+      <Hangar />
       <section aria-labelledby="parts-heading" className="space-y-3">
         <h3 id="parts-heading" className="text-lg font-semibold">
           Parts

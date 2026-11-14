@@ -262,6 +262,21 @@
     "provenance": "GAME"
   },
   {
+    "id": "computer-cube-radtol",
+    "name": "Radiation-tolerant CubeSat computer",
+    "category": "computer",
+    "description": "A small flight computer built to shrug off radiation, with a 64 Gbit recorder. Costs more than commercial boards, but solar storms cannot crash it.",
+    "massKg": 0.4,
+    "powerW": 3,
+    "costM": 0.5,
+    "reliability": 0.96,
+    "devMonths": 6,
+    "advanced": false,
+    "radHard": true,
+    "storageGbit": 64,
+    "provenance": "GAME"
+  },
+  {
     "id": "computer-std",
     "name": "Standard flight computer",
     "category": "computer",

@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import { ROLE_INFO, ROLES, type Role } from '@gravity/shared';
+import { Button, StatusBadge } from '../../components/ui.tsx';
+import { claimRoles, leaveRoom } from '../../lib/realtime.ts';
+import { useGame } from '../../store/game.ts';
+import { myMember, playerLabel, useOnline } from '../../store/online.ts';
+import { describeEdit } from './describeEdit.ts';
+
+/** Online room: code, players, role claims and proposals for me (FR-13). */
+export function OnlineTeamBar() {
+  const o = useOnline();
+  const respond = useGame((s) => s.respondToProposal);
+  const [copied, setCopied] = useState(false);
+  const me = myMember(o);
+  const holder = (role: Role) => o.members.find((m) => m.roles.includes(role));
+  const mine = o.proposals.filter((p) => me?.roles.includes(p.owner));
+  const unclaimed = ROLES.filter((r) => !holder(r));
+
+  const toggle = (role: Role) => {
+    if (!me) return;
+    const next = me.roles.includes(role) ? me.roles.filter((r) => r !== role) : [...me.roles, role];
+    if (next.length) claimRoles(next);
+  };
+
+  return (
+    <section
+      aria-label="Online room"
+      className="space-y-3 rounded-lg border border-teal-600 bg-teal-950/40 p-3"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p>
+          Online room <span className="font-mono text-lg font-bold tracking-widest">{o.code}</span>{' '}
+          <StatusBadge
+            status={
+              o.status === 'connected' ? 'green' : o.status === 'connecting' ? 'unknown' : 'red'
+            }
+            label={
+              o.status === 'connected'
+                ? 'Connected'
+                : o.status === 'connecting'
+                  ? 'Connecting'
+                  : 'Reconnecting'
+            }
+          />
+        </p>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => {
+              void navigator.clipboard?.writeText(o.code ?? '').then(() => setCopied(true));
+            }}
+          >
+            {copied ? 'Code copied' : 'Copy code'}
+          </Button>
+          <Button variant="ghost" onClick={leaveRoom}>
+            Leave room
+          </Button>
+        </div>
+      </div>
+
+      <ul className="grid gap-2 sm:grid-cols-2">
+        {o.members.map((m) => (
+          <li key={m.userId} className="rounded-md border border-slate-700 p-2 text-sm">
+            <span className="font-medium">{playerLabel(o, m.userId)}</span>
+            {!m.connected && <span className="ml-2 text-xs text-amber-200">offline</span>}
+            <span className="block text-xs text-slate-300">
+              {m.roles.length ? m.roles.map((r) => ROLE_INFO[r].name).join(' + ') : 'No role yet'}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      {me && (
+        <fieldset className="space-y-1">
+          <legend className="text-sm font-semibold">Your roles</legend>
+          <div className="flex flex-wrap gap-2">
+            {ROLES.map((r) => {
+              const owner = holder(r);
+              const takenByOther = owner && owner.userId !== me.userId;
+              return (
+                <button
+                  key={r}
+                  type="button"
+                  aria-pressed={me.roles.includes(r)}
+                  disabled={!!takenByOther}
+                  onClick={() => toggle(r)}
+                  className="rounded-full border border-slate-600 px-3 py-1 text-left text-sm aria-pressed:border-teal-400 aria-pressed:bg-teal-900 disabled:opacity-40"
+                >
+                  {/* The role name stays the accessible name; details are visible text, not a tooltip. */}
+                  <span className="font-medium">{ROLE_INFO[r].name}</span>
+                  <span className="block text-xs text-slate-300">
+                    {takenByOther ? `Held by ${playerLabel(o, owner.userId)}` : ROLE_INFO[r].owns}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {unclaimed.length > 0 && (
+            <p className="text-xs text-amber-200">
+              Unclaimed: {unclaimed.map((r) => ROLE_INFO[r].name).join(', ')}. Someone must hold
+              every role so all parts of the design can be edited.
+            </p>
+          )}
+        </fieldset>
+      )}
+
+      {mine.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold">Proposals for you</h3>
+          {mine.map((p) => (
+            <div key={p.id} className="flex flex-wrap items-center gap-2 text-sm">
+              <span>
+                {playerLabel(o, p.from)} proposes to {describeEdit(p.edit)} ("{p.message}").
+              </span>
+              <Button variant="primary" onClick={() => respond(p.id, true)}>
+                Accept
+              </Button>
+              <Button onClick={() => respond(p.id, false)}>Reject</Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}

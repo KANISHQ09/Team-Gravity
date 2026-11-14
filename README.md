@@ -1,6 +1,6 @@
 # GRAVITY — Space Mission Design Game
 
-> **Status: ✅ playable MVP (Phase 8).** All three scenarios can be designed, launched and scored in the browser, solo or hot-seat with up to four players. The server provides guest login, server-side scoring, leaderboards and online co-op rooms (the web lobby for online rooms is a follow-up). See the [roadmap](docs/ROADMAP.md).
+> **Status: ✅ playable MVP with online co-op (Phases 8–9).** All three missions can be designed, launched and scored in the browser: solo, hot-seat, or online with up to four players. The server provides guest login, server-side scoring, Postgres leaderboards and co-op rooms. Full description of the game: [docs/SOLUTION.md](docs/SOLUTION.md).
 
 GRAVITY is a browser game for the **NASA Space Apps Challenge 2026 — Space Mission Design Game**. Solo or in a team of up to four, players design a complete space mission: pick a science objective, turn it into measurable requirements, design the spacecraft and choose instruments, pick a launch vehicle and orbit, balance **mass, power, budget, data, communications and time**, pass a launch-readiness review, fly the mission, and read a report that explains **why** it succeeded or failed.
 
@@ -17,21 +17,26 @@ No public deployment yet. Run it locally with `pnpm dev` (see below) and open <h
 | Mission setup | 3 scenarios (CubeSat Earth Observer, Lunar Orbiter, Mars Orbiter); Explorer / Engineer / Flight Director difficulty |
 | NASA-style flow | Six stages: Need & Goals → Concept → Requirements → Design → Build & Verify → Implement |
 | Science first | Goal selection and a live Science Traceability Matrix (goal → measurement → instrument → requirement) |
-| Design | 40 parts, 5 launch vehicles, 13 orbits; Master Equipment List; live gauges for mass, power, budget, data, communications and schedule; unavailable options show why |
+| 3D hangar | Your real design built in 3D (gold foil, solar wings, dishes, instruments); click parts to inspect them, X-ray view of batteries, wheels and tanks, camera views, and a deployment test that unfolds the arrays and hot-fires the engine |
+| 3D flight you fly yourself | Launch from Earth, separation, cruise and orbit around Earth, the Moon or Mars, with four playable mini-games: steer the launch through Max-Q, time the orbit-insertion burn (real orbital mechanics), aim the instrument and downlink data, and react to anomalies. Skill earns a separate **pilot rating**; the mission score stays design-based |
+| Design | 41 parts, 5 launch vehicles, 13 orbits; Master Equipment List; live gauges for mass, power, budget, data, communications and schedule; unavailable options show why |
 | Requirements | 12+ measurable requirements, each with a verification method (test, analysis, inspection, demonstration) |
 | Readiness | Green/yellow/red launch review (≥ 80% green and every critical item green) and a 5×5 risk matrix |
 | Simulation | Deterministic six-phase simulation with random events (solar storms, wheel failures, launch slips, budget cuts, antenna anomalies, battery wear) that your design choices soften |
 | Report | 0–100 score in five parts, cause-and-effect explanations, one-click "Try changing…" suggestions, similar real NASA missions, 2D mission replay |
-| Team play | Hot-seat co-op for 2–4 players with roles, proposals and a GO/NO-GO vote. Server-side online rooms (Socket.IO) are implemented and tested; the web lobby for them is a follow-up |
+| Team play | **Online rooms** for 2–4 players (share a 6-letter code; live design sync, roles, proposals, GO/NO-GO, shared launch) and **hot-seat** co-op on one device |
+| Compare designs | Trade-space chart of all your runs (cost vs science, risk by marker shape) and a "What matters most?" sensitivity view |
 | Sharing | Autosave in the browser; shareable design codes; optional online leaderboard (server recomputes every score) |
 | Learning | Explorer hints, glossary, "why does this matter?" on every part; every number labelled `NASA` / `DERIVED` / `GAME` |
-| Accessibility | Keyboard play, labelled controls, status never shown by colour alone, reduced motion, phone layout |
+| Accessibility | Keyboard play, labelled controls, status never shown by colour alone, reduced motion, phone layout; automated axe-core checks on every screen |
+| Offline | Installable web app; after the first visit solo play (including 3D) works without internet |
+| Landing page | Full-screen space video hero, mission cards and an agency-style layout (own design; no NASA branding) |
 
 Full list and roadmap: [docs/FEATURES.md](docs/FEATURES.md), [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Technology stack
 
-TypeScript monorepo (pnpm + Turborepo) · React 18, Vite, Zustand, Tailwind CSS · Node.js 22, Fastify, Socket.IO · PostgreSQL 16 + Drizzle · Redis · Vitest, fast-check · GitHub Actions.
+TypeScript monorepo (pnpm + Turborepo) · React 18, Vite, Zustand, Tailwind CSS, Socket.IO client, vite-plugin-pwa · Node.js 22, Fastify, Socket.IO · PostgreSQL 16 + Drizzle · Redis · Vitest, fast-check, Testing Library, axe-core · GitHub Actions.
 
 Details and trade-offs: [docs/TECH_STACK.md](docs/TECH_STACK.md).
 

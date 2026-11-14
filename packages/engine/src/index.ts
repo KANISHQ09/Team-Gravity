@@ -24,6 +24,7 @@ export * from './readiness/index.ts';
 export * from './readiness/risk.ts';
 export * from './requirements/index.ts';
 export * from './score/index.ts';
+export * from './score/sensitivity.ts';
 export * from './simulate/index.ts';
 export { createRng, type Rng } from './simulate/prng.ts';
 export * from './validate/index.ts';
