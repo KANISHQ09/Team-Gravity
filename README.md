@@ -90,6 +90,18 @@ The server runs without Postgres or Redis: scores are then kept in memory. With 
 
 All variables are documented in [`.env.example`](.env.example); copy it to `.env` for local development. The server validates them at startup and refuses to start if one is invalid. Never commit a real `.env` file. Background: [docs/TECH_STACK.md §3](docs/TECH_STACK.md#3-environment-variables-planned).
 
+## Deploying the web app (Vercel, static)
+
+Solo play, hot-seat team play, the 3D hangar and the 3D flight run entirely in the browser, so the web app can be hosted as static files. `apps/web/vercel.json` holds the build settings.
+
+1. On [vercel.com](https://vercel.com), **Add New → Project** and import this GitHub repository.
+2. Set **Root Directory** to `apps/web`. Vercel reads the install and build commands from `apps/web/vercel.json` (pnpm 12.17.0, `--frozen-lockfile`).
+3. Under **Settings → Build and Deployment**, set the Node.js version to **22.x**.
+4. Leave `VITE_API_URL` unset. Online rooms and the leaderboard then switch off with a friendly message; everything else works.
+5. **Deploy.** Each push to `main` updates the live site, and each pull request gets its own preview link.
+
+Online rooms need the game server (`apps/server`, plus Redis and Postgres) hosted separately; set `VITE_API_URL` to its address to switch them on.
+
 ## API documentation
 
 Planned REST endpoints and socket events: [docs/API_DOCUMENTATION.md](docs/API_DOCUMENTATION.md).

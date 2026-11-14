@@ -32,7 +32,7 @@
 | GMAT-generated trajectories in the 3D flight | Stretch item; the 3D flight uses schematic distances today | SRS-VIZ-02 |
 | Playwright browser end-to-end tests | Component, accessibility, mini-game and Socket.IO tests cover the flows today | SRS-TST |
 | PNG app icons (192/512 px) | SVG icon works in modern browsers; some app stores need PNG | — |
-| Deployment (Vercel / Fly.io) | Needs team approval and accounts | — |
+| Hosting the game server (online rooms, leaderboard) | The web app deploys to Vercel as static files (`apps/web/vercel.json`, approved 2026-11-15); the server, Redis and Postgres still need hosting and accounts | — |
 
 ### Phase 2 decisions needed
 
