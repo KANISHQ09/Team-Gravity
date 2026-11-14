@@ -56,7 +56,26 @@
 | `NASA_API_KEY` | server | post-MVP data panel |
 | `ANTHROPIC_API_KEY` | server | post-MVP Mission Mentor |
 
-## 4. Dependency policy
+## 4. Installed versions (Phase 5, 2026-11-14)
+
+Locked by `pnpm-lock.yaml`. Notable choices:
+
+| Tool | Version | Why this version |
+| --- | --- | --- |
+| pnpm | 12.17.0 | Pinned via `packageManager`; `minimumReleaseAge` (24 h) and an `allowBuilds` allow-list (only esbuild) harden installs |
+| TypeScript | 6.0.x | typescript-eslint supports TypeScript < 6.1, so 7.x is not used yet |
+| ESLint | 9.39.x | `eslint-plugin-jsx-a11y` (accessibility) does not support ESLint 10 yet |
+| React / ReactDOM | 18.3.1 | Approved stack is React 18 |
+| Vite / Vitest | 8.x / 5.x | Current majors |
+| Tailwind CSS | 4.x (`@tailwindcss/vite`) | Current major, no PostCSS config needed |
+| Fastify / Zod / Drizzle | 5.x / 4.x / 0.45.x | Current releases |
+| tsup | 9.x | Bundles the server with the internal `@gravity/*` TypeScript packages |
+
+**Installed now (only what the scaffold uses):** turbo, typescript, eslint + plugins, prettier, vitest, react, react-dom, vite, tailwindcss, testing-library, jsdom, fastify, zod, drizzle-orm, drizzle-kit, postgres, tsx, tsup. **Installed later, with the feature that needs it:** Zustand, Radix UI, Recharts, react-three-fiber, Framer Motion, Socket.IO, ioredis, BullMQ, Dexie, vite-plugin-pwa, i18next, Sentry, PostHog, fast-check, Playwright, Testcontainers, axe-core.
+
+**Known audit findings (dev tooling only, 2 moderate):** `esbuild ≤ 0.24.2` pulled in by `drizzle-kit` (affects esbuild's dev server, which we don't use), and `minimatch < 11.0.1` pulled in by `typescript-eslint` (ReDoS on lint globs). Neither ships to users; re-check when those tools release fixes.
+
+## 5. Dependency policy
 
 - No library is installed without a one-line reason in the PR description.
 - Versions are pinned by the lockfile; each new dependency's license is checked.

@@ -10,7 +10,7 @@ By taking part you agree to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 2. Find or open an issue for the work. Small fixes can skip this; features can't.
 3. Tell the team on the issue (or the team call) that you're picking it up.
 
-Local setup instructions will appear in the [README](README.md) after Phase 5.
+Local setup: [README → Installation and running locally](README.md#installation-and-running-locally). Run `pnpm check` before opening a PR; it runs the same checks as CI.
 
 ## 2. Branches
 
@@ -44,7 +44,7 @@ Examples: `feat(engine): add power budget with eclipse fraction` · `fix(studio)
 
 1. Push your branch and open a PR against **`main`**.
 2. Fill in the [PR template](.github/PULL_REQUEST_TEMPLATE.md) completely.
-3. CI must pass (lint, type-check, tests, build) once CI exists (Phase 7).
+3. CI must pass: the **CI** workflow (lint, format, type-check, tests, build, dependency audit) and **CodeQL** run on every PR.
 4. Get at least **one approval** from another team member. During the hackathon a verbal "ship it" on the team call is acceptable; note it in the PR.
 5. A team member **squash-merges**; the branch is then deleted.
 
@@ -52,14 +52,14 @@ PR size: aim for under ~400 changed lines. Split larger work.
 
 ### About Claude Code and other AI assistants
 
-AI assistants may edit files locally but **never** commit, push, merge or open PRs. A human team member reviews the changes and runs every Git command. See `CLAUDE.md` (added in Phase 6).
+AI assistants may edit files locally but **never** commit, push, merge or open PRs. A human team member reviews the changes and runs every Git command. See [CLAUDE.md](CLAUDE.md) §6–7; `.claude/settings.json` blocks those commands for Claude Code. Personal Claude settings go in `.claude/settings.local.json` (git-ignored). Don't use it to weaken the deny rules.
 
 ## 5. Code standards
 
 | Area | Rule |
 | --- | --- |
 | Language | TypeScript in strict mode everywhere |
-| Format and lint | Prettier + ESLint (configured in Phase 5); fix all warnings before opening a PR |
+| Format and lint | Prettier + ESLint (`pnpm format`, `pnpm lint:fix`); fix all warnings before opening a PR |
 | Structure | Follow [FOLDER_STRUCTURE.md](docs/FOLDER_STRUCTURE.md); group code by feature; don't create duplicate components |
 | Engine | `packages/engine` stays **pure and deterministic**: no DOM, network, `Date.now()` or unseeded `Math.random()` |
 | Data | Game numbers live in `packages/catalog/data/*.json` with a provenance label (`NASA` / `DERIVED` / `GAME`); new sources go in [DATA_LEDGER.md](docs/DATA_LEDGER.md) |

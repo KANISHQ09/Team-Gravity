@@ -1,0 +1,33 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": [".env"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["VITE_*"],
+      "outputs": ["dist/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "passThroughEnv": [
+        "NODE_ENV",
+        "HOST",
+        "PORT",
+        "LOG_LEVEL",
+        "CORS_ORIGIN",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "JWT_SIGNING_KEY",
+        "VITE_*"
+      ]
+    }
+  }
+}

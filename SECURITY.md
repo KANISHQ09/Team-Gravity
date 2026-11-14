@@ -47,6 +47,6 @@ We will not take action against good-faith research that avoids privacy violatio
 - All input is validated with Zod; unknown fields are rejected.
 - Leaderboard scores are recomputed on the server, never trusted from the client.
 - Secrets live only in platform secret stores and git-ignored `.env` files.
-- Dependencies are scanned (Dependabot, CodeQL) once CI is set up.
+- Dependencies are kept up to date by Dependabot; CI fails on high or critical `pnpm audit` findings; CodeQL scans the code on every PR and weekly.
 
 Because the audience includes young players, reports involving child safety or privacy are treated as high priority.

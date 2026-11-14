@@ -1,7 +1,7 @@
 name: Feature request
 description: Suggest an idea or improvement for GRAVITY
-title: "feat: "
-labels: ["enhancement"]
+title: 'feat: '
+labels: ['enhancement']
 body:
   - type: textarea
     id: problem
@@ -33,4 +33,4 @@ body:
     id: requirement
     attributes:
       label: Related requirement ID (if any)
-      placeholder: "FR-06"
+      placeholder: 'FR-06'

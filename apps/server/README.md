@@ -4,6 +4,7 @@ Node.js 22 + Fastify (REST) + Socket.IO (co-op rooms). Server-authoritative: re-
 
 - Imports `@gravity/engine` and `@gravity/shared`.
 - Never imports `apps/web`.
-- Dockerfile and package.json are added in Phase 5.
+- Entry point `src/main.ts`; the Fastify app is built in `src/app.ts` so tests can use `app.inject()`.
+- A `Dockerfile` is added only when deployment is approved.
 
 See [docs/FOLDER_STRUCTURE.md](../../docs/FOLDER_STRUCTURE.md).

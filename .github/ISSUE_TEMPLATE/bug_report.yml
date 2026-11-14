@@ -1,7 +1,7 @@
 name: Bug report
 description: Something in GRAVITY doesn't work as expected
-title: "fix: "
-labels: ["bug"]
+title: 'fix: '
+labels: ['bug']
 body:
   - type: markdown
     attributes:
@@ -50,7 +50,7 @@ body:
     id: environment
     attributes:
       label: Browser and device
-      placeholder: "Chrome 131 on Windows 11 / Safari on iPad"
+      placeholder: 'Chrome 131 on Windows 11 / Safari on iPad'
   - type: textarea
     id: extra
     attributes:

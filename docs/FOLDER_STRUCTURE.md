@@ -104,9 +104,10 @@ Team-Gravity/
 ├── resources/                       # challenge brief, resources guide, Gravity.md (reference)
 │
 ├── .github/
-│   ├── workflows/                   # ci.yml: validation only (lint, type-check, test, build)
+│   ├── workflows/                   # ci.yml (lint, format, typecheck, test, build, audit) + codeql.yml; validation only
 │   ├── ISSUE_TEMPLATE/              # bug report, feature request
 │   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── dependabot.yml               # weekly dependency + Actions update PRs (never auto-merged)
 │   └── CODEOWNERS
 │
 ├── .claude/
@@ -114,11 +115,11 @@ Team-Gravity/
 │
 ├── .editorconfig  .gitattributes  .gitignore      # ✅ Phase 2
 ├── .env.example                     # documented variables, no secrets (Phase 5)
-├── .prettierrc  eslint.config.js    # formatting + lint (Phase 5)
+├── .prettierrc.json  eslint.config.js  # formatting + lint (Phase 5)
 ├── tsconfig.base.json               # shared strict TypeScript settings (Phase 5)
 ├── docker-compose.yml               # local Postgres 16 + Redis (Phase 5)
 ├── package.json                     # root scripts: dev, build, lint, test, typecheck
-├── pnpm-workspace.yaml              # apps/*, packages/*, tools/*
+├── pnpm-workspace.yaml              # apps/*, packages/* (tools/* added when a tool gets a package.json)
 ├── turbo.json                       # task pipeline + caching
 ├── CLAUDE.md                        # Claude Code rules + strict Git restrictions (Phase 6)
 ├── README.md  CONTRIBUTING.md  SECURITY.md  CODE_OF_CONDUCT.md  # Phase 4
@@ -161,13 +162,19 @@ flowchart LR
 
 **Created (Phase 3):** 54 folders under `apps/`, `packages/` and `tools/`, each with a short `README.md` stating its purpose and rules (Git doesn't track empty folders, and a README is more useful than a `.gitkeep`).
 
-**Created later, with real content:**
+**Added in later phases:**
 
-| Path | Phase | Why not now |
+| Phase | Files |
+| --- | --- |
+| 4 Documentation | `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/`, `.github/CODEOWNERS`, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md` |
+| 5 Dev environment | Root `package.json`, `pnpm-workspace.yaml`, `turbo.json`, `tsconfig.base.json`, `eslint.config.js`, `.prettierrc.json`, `.prettierignore`, `.nvmrc`, `.env.example`, `docker-compose.yml`, `docs/DOCKER_SETUP.md`; plus `package.json`, `tsconfig.json`, a placeholder `src/` and a smoke test in every package and app |
+| 6 Claude Code | `CLAUDE.md`, `.claude/settings.json` |
+| 7 Validation | `.github/workflows/ci.yml`, `.github/workflows/codeql.yml`, `.github/dependabot.yml` |
+
+**Still to come, with real content:**
+
+| Path | When | Why not now |
 | --- | --- | --- |
-| `apps/web/public/` | 5 | A README there would be copied into the built site |
-| `package.json`, `tsconfig*.json`, `vite.config.ts`, `Dockerfile`, `main.ts`, `index.html` | 5 | Config and dependencies belong to the dev-environment phase |
-| `.env.example`, `docker-compose.yml`, `pnpm-workspace.yaml`, `turbo.json`, ESLint/Prettier configs | 5 | Same |
-| `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/`, `.github/CODEOWNERS`, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md` | 4 | Documentation phase (placeholder Markdown in `ISSUE_TEMPLATE/` would appear as a template) |
-| `CLAUDE.md`, `.claude/settings.json` | 6 | Claude Code configuration phase |
-| `.github/workflows/ci.yml` | 7 | CI is set up during validation |
+| `apps/web/public/` | Phase 8 | Added with the first real static asset (a README there would be copied into the built site) |
+| `apps/web/playwright.config.ts` | Phase 8 | Added with the first end-to-end flow |
+| `apps/server/Dockerfile`, `fly.toml` | When deployment is approved | No deployment yet |

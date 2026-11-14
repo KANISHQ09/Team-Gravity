@@ -1,6 +1,6 @@
 # GRAVITY — Space Mission Design Game
 
-> **Status: 🚧 pre-development.** Planning, repository setup and folder structure are done; no game code exists yet. This README describes the **planned** product and will be updated as features are actually built. See the [roadmap](docs/ROADMAP.md).
+> **Status: 🚧 pre-development.** Planning, repository setup, folder structure and the development environment are done; no game features exist yet (the web app shows a placeholder page and the server only answers `/healthz`). This README describes the **planned** product and will be updated as features are actually built. See the [roadmap](docs/ROADMAP.md).
 
 GRAVITY is a browser game for the **NASA Space Apps Challenge 2026 — Space Mission Design Game**. Solo or in a team of up to four, players design a complete space mission: pick a science objective, turn it into measurable requirements, design the spacecraft and choose instruments, pick a launch vehicle and orbit, balance **mass, power, budget, data, communications and time**, pass a launch-readiness review, fly the mission, and read a report that explains **why** it succeeded or failed.
 
@@ -45,20 +45,37 @@ flowchart LR
 
 Solo play runs entirely in the browser (offline after the first load). Co-op rooms are server-authoritative and use the same engine. More: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Prerequisites (planned)
+## Prerequisites
 
-- Node.js 22 LTS
-- pnpm 9+
-- Docker Desktop (local PostgreSQL and Redis)
+- **Node.js 22 LTS** (22.12 or newer; see `.nvmrc`)
+- **pnpm 12.17.0** (pinned in `package.json`). Install it with `corepack enable` (recommended) or `npm install -g pnpm@12.17.0`. If neither works, prefix commands with `npx pnpm@12.17.0` instead of `pnpm`.
+- **Docker Desktop**: runs PostgreSQL 16 and Redis locally (only needed once server features use them). Setup and everyday commands: [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md)
 - Git
 
 ## Installation and running locally
 
-Not available yet. The development environment is set up in **Phase 5**, after which this section will list the exact commands (install, start local services, run migrations, start the dev servers).
+```bash
+pnpm install                  # install all workspace dependencies
+cp .env.example .env          # defaults work for local dev; JWT_SIGNING_KEY can stay empty for now
+pnpm services:up              # start local PostgreSQL + Redis (Docker)
+pnpm dev                      # web on http://localhost:5173, server on http://localhost:3000
+```
+
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Starts the web app (Vite) and the server (tsx watch) together. If port 5173 is busy, use `pnpm --filter @gravity/web dev --port 5174` |
+| `pnpm build` | Production build of the web app (`apps/web/dist`) and server (`apps/server/dist`) |
+| `pnpm test` | Runs all Vitest suites |
+| `pnpm typecheck` | Strict TypeScript check of every package |
+| `pnpm lint` / `pnpm lint:fix` | ESLint (includes accessibility and engine-purity rules) |
+| `pnpm format` / `pnpm format:check` | Prettier |
+| `pnpm check` | Lint, format check, typecheck, tests and build: the same checks CI runs |
+| `pnpm services:down` | Stop the local database and Redis |
+| `pnpm --filter @gravity/server db:generate` | Generate a Drizzle migration from the schema |
 
 ## Environment variables
 
-Planned variables are listed in [docs/TECH_STACK.md §3](docs/TECH_STACK.md#3-environment-variables-planned). An `.env.example` file will be added in Phase 5. Never commit a real `.env` file.
+All variables are documented in [`.env.example`](.env.example); copy it to `.env` for local development. The server validates them at startup and refuses to start if one is invalid. Never commit a real `.env` file. Background: [docs/TECH_STACK.md §3](docs/TECH_STACK.md#3-environment-variables-planned).
 
 ## API documentation
 

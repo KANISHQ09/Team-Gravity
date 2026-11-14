@@ -12,9 +12,9 @@
 | **2 Repository** | Repo basics | `.gitignore`, `.editorconfig`, `.gitattributes`; branch strategy decided ✅ License MIT, `main` + `feature/*`, public; `.gitignore`, `.gitattributes`, `.editorconfig` added |
 | **3 Folder structure** | Skeleton [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md): `apps/web`, `apps/server`, `packages/{shared,catalog,engine}`, `tools/`, each with a README | ✅ Approved (2026-11-14); skeleton created |
 | **4 Documentation** | Community files | `README.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, issue templates, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md`, `.github/CODEOWNERS` | ✅ Drafted (2026-11-14); review |
-| **5 Dev environment** | Tooling | pnpm + Turborepo workspace, TypeScript configs, ESLint, Prettier, Vitest, Playwright, Docker Compose (Postgres 16 + Redis), Drizzle migration `0001_init`, `.env.example` | Review dependency list; team creates Neon/Upstash accounts |
-| **6 Claude Code config** | Rules for Claude | Root `CLAUDE.md`: development rules, coding standards, **strict Git restrictions** | Review |
-| **7 Validation** | Everything works | `pnpm install`, lint, type-check, test, build all pass; GitHub Actions CI that only validates (no deploy); secret scan; repo review report | ⛔ Approve the start of feature work |
+| **5 Dev environment** | Tooling | pnpm + Turborepo workspace, TypeScript configs, ESLint, Prettier, Vitest, Docker Compose (Postgres 16 + Redis), Drizzle config, `.env.example` | ✅ Done (2026-11-14): lint, format, typecheck, test and build pass. Deferred: Playwright (with the first E2E flow), migration `0001_init` (with the schema, Phase 8). Team creates Neon/Upstash accounts |
+| **6 Claude Code config** | Rules for Claude | Root `CLAUDE.md`: development rules, coding standards, **strict Git restrictions**; `.claude/settings.json` deny rules that block Git/GitHub write commands | ✅ Done (2026-11-14); deny rules verified live |
+| **7 Validation** | Everything works | `.github/workflows/ci.yml` (lint, format, typecheck, test, build, `pnpm audit` high+) and `codeql.yml`, `dependabot.yml`; actions pinned to commit SHAs; validation only (no deploy, no merge). Local run: frozen install + `pnpm check` + audit pass; secret scan clean; stale docs fixed; Git deny rules extended to 100 | ✅ Done locally (2026-11-14); CI's first real run happens after push. ⛔ Approve the start of feature work |
 | **8 Development** | Build features | Small tasks, one per branch, PRs raised manually | Per PR |
 
 ### Phase 2 decisions needed
@@ -41,7 +41,7 @@
 
 ### Recommended GitHub settings (for a team member to apply manually)
 
-Settings → Branches → add a rule for `main`: require a pull request before merging; require status checks to pass (once CI exists in Phase 7); block force pushes; block deletions. Settings → General → allow **squash merging** only; enable "Automatically delete head branches".
+Settings → Branches → add a rule for `main`: require a pull request before merging; require status checks to pass and select **"Lint, typecheck, test, build"** and **"Analyze (JavaScript/TypeScript)"** (they appear after the first CI run); block force pushes; block deletions. Settings → General → allow **squash merging** only; enable "Automatically delete head branches".
 
 ## Part B — Hackathon build (after Phase 7 approval)
 
@@ -73,18 +73,18 @@ Times are relative to the team's kickoff (T+0). Detail: Gravity.md §4.3.
 - [x] Technology stack approved (full Gravity.md stack, 2026-11-14)
 - [x] Architecture documented (draft)
 - [x] Folder structure approved
-- [x] GitHub repository created (`KANISHQ09/Team-Gravity` exists as a remote; no commits yet)
+- [x] GitHub repository created (`KANISHQ09/Team-Gravity`, public)
 - [x] Branching strategy decided (`main` + `feature/*`)
 - [x] LICENSE selected (MIT)
 - [x] README.md created
 - [x] CONTRIBUTING.md created
 - [x] SECURITY.md created
 - [x] CODE_OF_CONDUCT.md created
-- [ ] CLAUDE.md configured
-- [ ] Strict Git restrictions added
-- [ ] Environment variables configured
+- [x] CLAUDE.md configured
+- [x] Strict Git restrictions added (CLAUDE.md §6–7 + `.claude/settings.json` deny rules)
+- [x] Environment variables configured (`.env.example`, validated by the server)
 - [x] .gitignore configured
-- [ ] Linting and formatting configured
-- [ ] Testing environment configured
-- [ ] GitHub Actions CI configured
-- [ ] Initial build and tests verified
+- [x] Linting and formatting configured
+- [x] Testing environment configured (Vitest; Playwright added with the first E2E flow)
+- [x] GitHub Actions CI configured (first run on GitHub after push)
+- [x] Initial build and tests verified (locally: 9 tests, build, audit)

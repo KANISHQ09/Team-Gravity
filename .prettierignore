@@ -1,0 +1,10 @@
+pnpm-lock.yaml
+**/dist
+**/coverage
+**/.turbo
+**/node_modules
+apps/server/src/db/migrations
+resources/
+
+# Hand-written Markdown docs keep their current formatting (tables etc.)
+*.md

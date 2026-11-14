@@ -1,0 +1,12 @@
+packages:
+  - apps/*
+  - packages/*
+
+# Supply-chain safety: don't install package versions published less than
+# 24 hours ago (gives the registry time to catch compromised releases).
+minimumReleaseAge: 1440
+
+# Packages allowed to run install scripts (everything else is blocked).
+# esbuild: downloads/verifies its native binary; used by tsx, tsup, drizzle-kit.
+allowBuilds:
+  esbuild: true
