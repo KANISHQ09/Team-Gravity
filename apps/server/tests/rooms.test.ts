@@ -2,7 +2,8 @@ import type { AddressInfo } from 'node:net';
 import type { FastifyInstance } from 'fastify';
 import { io as connect, type Socket } from 'socket.io-client';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { RoomService } from '../src/modules/rooms/service.ts';
+import { RoomService, allGo } from '../src/modules/rooms/service.ts';
+import { memoryRoomStore } from '../src/modules/rooms/store.ts';
 import { BALANCE_DESIGNS } from '../../../packages/engine/tests/fixtures/designs.ts';
 import { guestToken, makeApp } from './helpers.ts';
 
@@ -153,29 +154,29 @@ describe('co-op rooms over Socket.IO (SRS-COL)', () => {
 });
 
 describe('RoomService rules', () => {
-  it('caps rooms at four players and sweeps idle rooms after 30 minutes', () => {
+  it('caps rooms at four players and sweeps idle rooms after 30 minutes', async () => {
     let now = 0;
-    const rooms = new RoomService(() => now);
-    const room = rooms.create('u1', 'lunar-orbiter', 'engineer');
-    for (const u of ['u2', 'u3', 'u4']) rooms.join(room.code, u);
-    expect(() => rooms.join(room.code, 'u5')).toThrow(/four players/);
+    const rooms = new RoomService(memoryRoomStore(), () => now);
+    const room = await rooms.create('u1', 'lunar-orbiter', 'engineer');
+    for (const u of ['u2', 'u3', 'u4']) await rooms.join(room.code, u);
+    await expect(rooms.join(room.code, 'u5')).rejects.toThrow(/four players/);
     now = 31 * 60 * 1000;
-    expect(rooms.sweep()).toBe(1);
-    expect(rooms.size).toBe(0);
+    expect(await rooms.sweep()).toBe(1);
+    expect(await rooms.size()).toBe(0);
   });
 
-  it('resets GO votes whenever the design changes', () => {
+  it('resets GO votes whenever the design changes', async () => {
     const rooms = new RoomService();
-    const room = rooms.create('u1', 'lunar-orbiter', 'engineer');
-    rooms.claimRoles(room, 'u1', [
+    const { id } = await rooms.create('u1', 'lunar-orbiter', 'engineer');
+    await rooms.claimRoles(id, 'u1', [
       'mission-architect',
       'science-lead',
       'spacecraft-engineer',
       'operations',
     ]);
-    rooms.vote(room, 'u1', { vote: 'go' });
-    expect(rooms.allGo(room)).toBe(true);
-    rooms.patch(room, 'u1', { type: 'setGroundStations', count: 2 }, 0);
-    expect(rooms.allGo(room)).toBe(false);
+    expect(allGo(await rooms.vote(id, 'u1', { vote: 'go' }))).toBe(true);
+    expect(allGo(await rooms.patch(id, 'u1', { type: 'setGroundStations', count: 2 }, 0))).toBe(
+      false,
+    );
   });
 });

@@ -25,11 +25,11 @@
 
 | Item | Why it was deferred | Requirement |
 | --- | --- | --- |
-| Web lobby for **online** rooms | Server side (REST + Socket.IO) is built and tested; hot-seat co-op covers the 1–4 player requirement in the web app (planned cut line 5) | FR-13 (online part), FR-13b |
+| Web lobby for **online** rooms | Server side (REST + Socket.IO) is built and tested, with a typed event contract in `packages/shared/src/realtime.ts`; hot-seat co-op covers the 1–4 player requirement in the web app (planned cut line 5) | FR-13 (online part), FR-13b |
 | Engine in a Web Worker | The engine reviews a design in a few milliseconds, so it runs on the main thread for now | ARCHITECTURE §2 |
 | Offline service worker (PWA) | Autosave already keeps designs; offline loading needs `vite-plugin-pwa` | FR-12 (offline after first load) |
 | i18n (i18next), Radix UI, Recharts, Dexie | Not needed for the MVP; native HTML, SVG and localStorage cover it with fewer dependencies | TECH_STACK |
-| Redis room state + Socket.IO Redis adapter, BullMQ jobs | One server instance holds rooms in memory; Redis is used for rate limits and readiness | SRS-REL-03/04 |
+| BullMQ jobs | Rooms expire through Redis TTLs and an in-process sweep, so no queue is needed yet. (Redis room state, the Socket.IO Redis adapter, leave/remove/host handover and the Postgres room archive were added on `feature/server-realtime-contract`.) | SRS-REL-03/04 |
 | Trade-space chart, sensitivity view, 3D views | Stretch items, first on the cut list | FR-19, FR-20 (3D) |
 | Playwright end-to-end and axe-core tests | Component tests cover the full loop with Testing Library; browser E2E next | SRS-TST |
 | Deployment (Vercel / Fly.io) | Needs team approval and accounts | — |

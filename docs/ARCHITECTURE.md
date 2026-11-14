@@ -162,7 +162,7 @@ Post-MVP: `POST /auth/oauth`, `/designs` CRUD, `GET /nasa/*`. Errors use RFC 945
 
 | Client → server | Server → client |
 | --- | --- |
-| `room:join`, `role:claim`, `design:patch`, `proposal:create`, `proposal:respond`, `vote:cast`, `sim:start` | `room:state`, `design:applied`, `design:rejected`, `proposal:update`, `vote:update`, `sim:result` |
+| `room:join`, `room:leave`, `role:claim`, `design:patch`, `proposal:create`, `proposal:respond`, `vote:cast`, `member:remove`, `sim:start` | `room:state`, `design:applied`, `design:rejected`, `proposal:update`, `vote:update`, `sim:result`, `room:left`, `room:error` |
 
 Every message is validated with Zod and unknown fields are rejected. Limits: 20 events per second per connection, 5 rooms per hour per client.
 
