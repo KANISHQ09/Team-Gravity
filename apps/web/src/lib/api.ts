@@ -5,6 +5,7 @@ import type { Design, Difficulty } from '@gravity/shared';
  * every call fails soft and the UI shows the game as offline.
  */
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ?? '';
+export const API_BASE = BASE;
 
 export interface LeaderboardEntry {
   readonly rank: number;
@@ -32,17 +33,31 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T;
 }
 
-let accessToken: { value: string; expiresAt: number } | null = null;
+let session: { token: string; guestId: string; expiresAt: number } | null = null;
 
-/** Guest session (no personal data); refreshed a minute before it expires. */
-async function token(): Promise<string> {
-  if (accessToken && accessToken.expiresAt > Date.now() + 60_000) return accessToken.value;
-  const r = await call<{ accessToken: string; expiresIn: number }>('/auth/guest', {
+/** Guest session (no personal data); renewed a minute before it expires. */
+export async function guestSession(): Promise<{ token: string; guestId: string }> {
+  if (session && session.expiresAt > Date.now() + 60_000) return session;
+  const r = await call<{ accessToken: string; guestId: string; expiresIn: number }>('/auth/guest', {
     method: 'POST',
     credentials: 'include',
   });
-  accessToken = { value: r.accessToken, expiresAt: Date.now() + r.expiresIn * 1000 };
-  return accessToken.value;
+  session = {
+    token: r.accessToken,
+    guestId: r.guestId,
+    expiresAt: Date.now() + r.expiresIn * 1000,
+  };
+  return session;
+}
+
+const token = async () => (await guestSession()).token;
+
+export async function createRoom(scenarioId: string, difficulty: Difficulty) {
+  return call<{ code: string; roomId: string }>('/rooms', {
+    method: 'POST',
+    body: JSON.stringify({ scenarioId, difficulty }),
+    headers: { authorization: `Bearer ${await token()}` },
+  });
 }
 
 export async function submitScore(input: {

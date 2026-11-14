@@ -1,4 +1,4 @@
-import type { Body, Difficulty, ProvenanceLabel } from '@gravity/shared';
+import type { Body, Difficulty, ProvenanceLabel, ResourceKey } from '@gravity/shared';
 
 /** A constant together with where it comes from (docs/DATA_LEDGER.md). */
 export interface Constant {
@@ -46,6 +46,16 @@ export const MARGIN_TARGET: Record<Difficulty, number> = {
   engineer: 0.2,
   'flight-director': 0.35,
 };
+
+/**
+ * Margin target for one resource. The CML 4 checklist asks for 35% on the
+ * physical resources (mass, power, energy, data, link); money and schedule
+ * use at most the Engineer target of 20%, so Flight Director stays winnable.
+ */
+export function marginTarget(difficulty: Difficulty, resource: ResourceKey): number {
+  const t = MARGIN_TARGET[difficulty];
+  return resource === 'budget' || resource === 'time' ? Math.min(t, MARGIN_TARGET.engineer) : t;
+}
 
 /** Random-event frequency multiplier by difficulty (GAME). */
 export const EVENT_RATE: Record<Difficulty, number> = {

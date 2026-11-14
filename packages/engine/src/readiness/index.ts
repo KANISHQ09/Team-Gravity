@@ -130,7 +130,7 @@ export function readinessFromAnalysis(a: DesignAnalysis): Readiness {
       g.key === 'mass' || g.key === 'budget' || (fd && (g.key === 'power' || g.key === 'comms'));
     items.push({
       id: `margin-${g.key}`,
-      label: `${g.label} margin ≥ ${Math.round(target * 100)}%`,
+      label: `${g.label} margin ≥ ${Math.round(g.target * 100)}%`,
       status,
       critical: critical && !(explorer && g.key !== 'mass' && g.key !== 'budget'),
       detail:

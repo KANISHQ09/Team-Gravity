@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { NO_GO_REASONS } from '@gravity/shared';
 import { Button, Card, StatusBadge } from '../../components/ui.tsx';
 import { useReview } from '../../hooks/useReview.ts';
-import { encodeDesign, useGame } from '../../store/game.ts';
+import { encodeDesign, useGame, type Vote } from '../../store/game.ts';
+import { playerLabel, useOnline } from '../../store/online.ts';
 
 /** Stage 6: team GO/NO-GO vote and launch (SRS-COL-04, AC-3). */
 export function LaunchStage() {
@@ -15,9 +16,33 @@ export function LaunchStage() {
   const setStage = useGame((s) => s.setStage);
   const [reason, setReason] = useState<(typeof NO_GO_REASONS)[number]>(NO_GO_REASONS[0]);
   const [copied, setCopied] = useState(false);
+  const online = useOnline();
   if (!data || !design) return null;
   const { review } = data;
-  const allGo = players.length > 0 && votes.every((v) => v?.vote === 'go');
+  // One row per voter: online room members, or hot-seat players on this device.
+  const voters: {
+    key: string;
+    name: string;
+    vote: Vote | null;
+    canVote: boolean;
+    index: number;
+  }[] = online.active
+    ? online.members.map((m, i) => ({
+        key: m.userId,
+        name: playerLabel(online, m.userId),
+        vote: m.vote,
+        canVote: m.userId === online.me,
+        index: i,
+      }))
+    : players.map((p, i) => ({
+        key: p.name,
+        name: p.name,
+        vote: votes[i] ?? null,
+        canVote: true,
+        index: i,
+      }));
+  const allGo = voters.length > 0 && voters.every((v) => v.vote?.vote === 'go');
+  const isHost = !online.active || online.me === online.hostId;
   const blockers = review.issues.filter((i) => i.severity === 'error');
   const code = encodeDesign(design);
 
@@ -56,11 +81,12 @@ export function LaunchStage() {
           Every player must vote GO. Any design change resets the poll.
         </p>
         <ul className="space-y-2">
-          {players.map((p, i) => {
-            const v = votes[i];
+          {voters.map((p) => {
+            const v = p.vote;
+            const i = p.index;
             return (
               <li
-                key={p.name}
+                key={p.key}
                 className="flex flex-wrap items-center gap-2 rounded-md border border-slate-700 p-2"
               >
                 <span className="min-w-24 font-medium">{p.name}</span>
@@ -72,29 +98,33 @@ export function LaunchStage() {
                 ) : (
                   <StatusBadge status="unknown" label="Not voted" />
                 )}
-                <Button
-                  variant="primary"
-                  disabled={!review.canLaunch}
-                  onClick={() => castVote(i, { vote: 'go' })}
-                >
-                  GO
-                </Button>
-                <label className="sr-only" htmlFor={`nogo-${i}`}>
-                  NO-GO reason for {p.name}
-                </label>
-                <select
-                  id={`nogo-${i}`}
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value as (typeof NO_GO_REASONS)[number])}
-                  className="rounded-md border border-slate-600 bg-slate-900 px-2 py-1.5 text-sm"
-                >
-                  {NO_GO_REASONS.map((r) => (
-                    <option key={r}>{r}</option>
-                  ))}
-                </select>
-                <Button variant="danger" onClick={() => castVote(i, { vote: 'no-go', reason })}>
-                  NO-GO
-                </Button>
+                {p.canVote && (
+                  <>
+                    <Button
+                      variant="primary"
+                      disabled={!review.canLaunch}
+                      onClick={() => castVote(i, { vote: 'go' })}
+                    >
+                      GO
+                    </Button>
+                    <label className="sr-only" htmlFor={`nogo-${i}`}>
+                      NO-GO reason for {p.name}
+                    </label>
+                    <select
+                      id={`nogo-${i}`}
+                      value={reason}
+                      onChange={(e) => setReason(e.target.value as (typeof NO_GO_REASONS)[number])}
+                      className="rounded-md border border-slate-600 bg-slate-900 px-2 py-1.5 text-sm"
+                    >
+                      {NO_GO_REASONS.map((r) => (
+                        <option key={r}>{r}</option>
+                      ))}
+                    </select>
+                    <Button variant="danger" onClick={() => castVote(i, { vote: 'no-go', reason })}>
+                      NO-GO
+                    </Button>
+                  </>
+                )}
               </li>
             );
           })}
@@ -102,7 +132,7 @@ export function LaunchStage() {
         <Button
           variant="primary"
           className="px-6 py-3 text-base"
-          disabled={!review.canLaunch || !allGo}
+          disabled={!review.canLaunch || !allGo || !isHost}
           aria-describedby="launch-help"
           onClick={launch}
         >
@@ -111,9 +141,11 @@ export function LaunchStage() {
         <p id="launch-help" className="text-sm text-slate-400">
           {!review.canLaunch
             ? 'Fix the blocking problems first.'
-            : allGo
-              ? 'All GO. Ready when you are.'
-              : 'Waiting for every player to vote GO.'}
+            : !isHost
+              ? 'Only the room host can press launch, once everyone votes GO.'
+              : allGo
+                ? 'All GO. Ready when you are.'
+                : 'Waiting for every player to vote GO.'}
         </p>
       </section>
 

@@ -13,7 +13,7 @@ import {
   traceability,
   validate,
 } from '../src/index.ts';
-import { BALANCE_DESIGNS, design } from './fixtures/designs.ts';
+import { BALANCE_DESIGNS, FLIGHT_DIRECTOR_CUBESAT, design } from './fixtures/designs.ts';
 
 const lunar = BALANCE_DESIGNS['lunar-orbiter']![0]!.design;
 const cubesat = BALANCE_DESIGNS['cubesat-earth-observer']![0]!.design;
@@ -285,4 +285,47 @@ describe('simulation and scoring (SRS-SIM, SRS-SCR)', () => {
     expect(report.analogs[0]?.name).toContain('Lunar Reconnaissance Orbiter');
     expect(report.analogs.every((a) => a.url.startsWith('https://science.nasa.gov/'))).toBe(true);
   });
+});
+
+describe('sensitivity (SRS-TRD-02)', () => {
+  it('ranks single changes by their effect on science, deterministically', async () => {
+    const { sensitivity } = await import('../src/index.ts');
+    const first = sensitivity(lunar, catalog);
+    expect(sensitivity(lunar, catalog)).toEqual(first);
+    expect(first.baseScience).toBeGreaterThan(0);
+    const labels = first.rows.map((r) => r.label);
+    expect(labels).toContain('Use 2 ground stations');
+    expect(labels).toContain('Remove the High-resolution camera');
+    // Sorted by size of effect.
+    const sizes = first.rows.map((r) => Math.abs(r.scienceDelta));
+    expect(sizes).toEqual([...sizes].sort((x, y) => y - x));
+    // Removing an instrument lowers science and saves money.
+    const remove = first.rows.find((r) => r.label === 'Remove the Imaging spectrometer')!;
+    expect(remove.scienceDelta).toBeLessThan(0);
+    expect(remove.costDeltaM).toBeLessThan(0);
+  });
+});
+
+describe('every scenario is winnable at every difficulty', () => {
+  const difficulties = ['explorer', 'engineer', 'flight-director'] as const;
+  for (const [scenarioId, list] of Object.entries(BALANCE_DESIGNS)) {
+    for (const difficulty of difficulties) {
+      it(`${scenarioId} @ ${difficulty} has a launchable design with a median score ≥ 85`, () => {
+        const candidates = [
+          ...list.map((x) => ({ ...x.design, difficulty })),
+          ...(scenarioId === 'cubesat-earth-observer'
+            ? [{ ...FLIGHT_DIRECTOR_CUBESAT, difficulty }]
+            : []),
+        ];
+        const winners = candidates.filter((d) => {
+          if (!reviewDesign(d).canLaunch) return false;
+          const s = Array.from({ length: 11 }, (_, k) => runMission(d, k + 1).report.total).sort(
+            (a, b) => a - b,
+          );
+          return s[5]! >= 85;
+        });
+        expect(winners.length).toBeGreaterThanOrEqual(1);
+      });
+    }
+  }
 });

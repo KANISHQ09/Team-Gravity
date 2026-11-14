@@ -226,3 +226,25 @@ export const BALANCE_DESIGNS: Record<string, { name: string; design: Design }[]>
     },
   ],
 };
+
+/**
+ * A Flight Director CubeSat: rad-tolerant computer, a second battery for
+ * battery-wear margin and schedule margin, so every risk is mitigated.
+ */
+export const FLIGHT_DIRECTOR_CUBESAT = design(
+  'cubesat-earth-observer',
+  'flight-director',
+  [
+    'bus-cubesat-6u',
+    'computer-cube-radtol',
+    'battery-cube',
+    'battery-cube',
+    'adcs-cube-wheels',
+    'solar-cube-deploy',
+    'antenna-sband-patch',
+    ...CUBESAT_PAYLOAD,
+  ],
+  'sso-550',
+  'lv-rideshare',
+  { mitigations: ['schedule-margin'] },
+);

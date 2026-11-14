@@ -10,7 +10,9 @@ import {
   editOwner,
   emptyDesign,
 } from '@gravity/shared';
-import { type MissionResult, runMission } from '@gravity/engine';
+import { type MissionResult, reviewDesign } from '@gravity/engine';
+import type { PilotSummary } from '../features/pilot/pilotScore.ts';
+import { runMissionOffThread } from '../lib/engineWorker.ts';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -27,6 +29,19 @@ export type StageId = (typeof STAGES)[number]['id'];
 
 export type Screen = 'home' | 'mission' | 'flight' | 'report' | 'glossary' | 'about';
 export type Vote = { vote: 'go' } | { vote: 'no-go'; reason: (typeof NO_GO_REASONS)[number] };
+
+/** One finished mission, kept for comparing designs (trade space). */
+export interface RunRecord {
+  readonly id: string;
+  readonly scenarioId: string;
+  readonly label: string;
+  readonly costM: number;
+  readonly science: number;
+  readonly total: number;
+  readonly outcome: 'full' | 'partial' | 'failure';
+  readonly risk: 'green' | 'yellow' | 'red';
+  readonly design: Design;
+}
 
 export interface Player {
   readonly name: string;
@@ -51,6 +66,10 @@ interface GameState {
   votes: (Vote | null)[];
   noGoVotes: number;
   result: MissionResult | null;
+  /** Pilot rating from the 3D flight mini-games; separate from the mission score. */
+  pilot: PilotSummary | null;
+  /** Recent missions on this device, for the trade-space chart (newest last, max 20). */
+  history: RunRecord[];
   /** Message explaining why the last action was not applied (shown in a live region). */
   notice: string | null;
 
@@ -66,6 +85,8 @@ interface GameState {
   redesign(edit?: DesignEdit): void;
   loadDesign(design: Design): void;
   dismissNotice(): void;
+  recordRun(result: MissionResult): void;
+  setPilot(pilot: PilotSummary | null): void;
 }
 
 const PLAYER_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
@@ -80,6 +101,26 @@ function newSeed(): number {
 export const canEdit = (player: Player | undefined, edit: DesignEdit) =>
   !!player && player.roles.includes(editOwner(edit));
 
+/**
+ * While the player is in an online room, these send actions to the server
+ * instead of applying them locally (registered by lib/realtime.ts; kept as a
+ * hook to avoid a circular import).
+ */
+export interface RemoteActions {
+  active(): boolean;
+  edit(edit: DesignEdit): void;
+  vote(vote: Vote): void;
+  respond(proposalId: string, accept: boolean): void;
+  launch(): void;
+  /** Leave the room but keep the design for solo iteration. */
+  leaveKeepingDesign(): void;
+}
+let remote: RemoteActions | null = null;
+export const registerRemote = (r: RemoteActions | null) => {
+  remote = r;
+};
+const online = () => (remote?.active() ? remote : null);
+
 export const useGame = create<GameState>()(
   persist(
     (set, get) => ({
@@ -93,7 +134,9 @@ export const useGame = create<GameState>()(
       votes: [],
       noGoVotes: 0,
       result: null,
+      pilot: null,
       notice: null,
+      history: [],
 
       go: (screen) => set({ screen, notice: null }),
       setStage: (stage) => set({ stage, screen: 'mission', notice: null }),
@@ -116,6 +159,8 @@ export const useGame = create<GameState>()(
       },
 
       edit: (edit) => {
+        const r = online();
+        if (r) return r.edit(edit);
         const { design, players, activePlayer, proposals } = get();
         if (!design) return;
         const player = players[activePlayer];
@@ -133,6 +178,8 @@ export const useGame = create<GameState>()(
       },
 
       respondToProposal: (id, accept) => {
+        const r = online();
+        if (r) return r.respond(id, accept);
         const { proposals, design, players, activePlayer } = get();
         const proposal = proposals.find((p) => p.id === id);
         if (!proposal || !design) return;
@@ -155,23 +202,38 @@ export const useGame = create<GameState>()(
       },
 
       castVote: (player, vote) => {
+        const r = online();
+        if (r) return r.vote(vote);
         const votes = [...get().votes];
         votes[player] = vote;
         set({ votes, noGoVotes: get().noGoVotes + (vote.vote === 'no-go' ? 1 : 0) });
       },
 
       launch: () => {
+        const r = online();
+        if (r) return r.launch();
         const { design, players, proposalsResolved, noGoVotes } = get();
         if (!design) return;
         const team =
           players.length > 1
             ? { playerCount: players.length, proposalsResolved, noGoVotes }
             : undefined;
-        const result = runMission(design, newSeed(), team);
-        set({ result, screen: 'flight', notice: null });
+        const run = runMissionOffThread(design, newSeed(), team);
+        if ('sync' in run) {
+          set({ result: run.sync, pilot: null, screen: 'flight', notice: null });
+          get().recordRun(run.sync);
+          return;
+        }
+        set({ notice: 'Launching… running the mission simulation.' });
+        void run.promise.then((result) => {
+          set({ result, pilot: null, screen: 'flight', notice: null });
+          get().recordRun(result);
+        });
       },
 
       redesign: (edit) => {
+        // After an online mission, iterate on the design solo (the room is finished).
+        online()?.leaveKeepingDesign();
         const { design, players } = get();
         if (!design) return;
         set({
@@ -200,6 +262,31 @@ export const useGame = create<GameState>()(
       },
 
       dismissNotice: () => set({ notice: null }),
+
+      setPilot: (pilot) => set({ pilot }),
+
+      recordRun: (result) => {
+        const { design } = result.run;
+        const review = reviewDesign(design);
+        const worstRisk = review.risks.some((r) => r.level === 'red')
+          ? 'red'
+          : review.risks.some((r) => r.level === 'yellow')
+            ? 'yellow'
+            : 'green';
+        const sameScenario = get().history.filter((h) => h.scenarioId === design.scenarioId).length;
+        const record: RunRecord = {
+          id: `${Date.now().toString(36)}-${result.run.seed}`,
+          scenarioId: design.scenarioId,
+          label: `Run ${sameScenario + 1}`,
+          costM: review.analysis.costM,
+          science: result.run.science,
+          total: result.report.total,
+          outcome: result.run.outcome,
+          risk: worstRisk,
+          design,
+        };
+        set({ history: [...get().history, record].slice(-20) });
+      },
     }),
     {
       name: 'gravity-game-v1',
@@ -215,6 +302,7 @@ export const useGame = create<GameState>()(
         proposalsResolved: s.proposalsResolved,
         votes: s.votes,
         noGoVotes: s.noGoVotes,
+        history: s.history,
       }),
       // Drop a saved design that no longer matches the schema (e.g. after an update).
       merge: (persisted, current) => {

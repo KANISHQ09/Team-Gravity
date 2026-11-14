@@ -1,6 +1,7 @@
 import { READINESS_THRESHOLD, type Risk } from '@gravity/engine';
 import { StatusBadge } from '../../components/ui.tsx';
 import { useReview } from '../../hooks/useReview.ts';
+import { SensitivityPanel } from '../trade-space/SensitivityPanel.tsx';
 import { cx, pct } from '../../lib/format.ts';
 
 export function VerifyStage() {
@@ -72,6 +73,8 @@ export function VerifyStage() {
       )}
 
       <RiskMatrix risks={risks} />
+
+      {data.review.canLaunch && <SensitivityPanel design={data.review.analysis.resolved.design} />}
     </div>
   );
 }

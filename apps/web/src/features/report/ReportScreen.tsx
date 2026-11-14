@@ -11,14 +11,19 @@ import {
 import { DIFFICULTY_LABEL, fmt } from '../../lib/format.ts';
 import { useGame } from '../../store/game.ts';
 import { MissionReplay } from '../replay/MissionReplay.tsx';
+import { TradeSpaceChart } from '../trade-space/TradeSpaceChart.tsx';
 
 /** Post-mission report: outcome, score, causes, suggestions (SRS-SCR-03…05). */
 export function ReportScreen() {
   const result = useGame((s) => s.result);
   const redesign = useGame((s) => s.redesign);
   const go = useGame((s) => s.go);
+  const history = useGame((s) => s.history);
+  const pilot = useGame((s) => s.pilot);
   if (!result) return null;
   const { run, report } = result;
+  const currentId =
+    history.findLast((h) => h.design === run.design || h.id.endsWith(`-${run.seed}`))?.id ?? null;
   const scenario = catalog.scenarios.find((s) => s.id === run.design.scenarioId)!;
   const b = report.breakdown;
   const parts = [
@@ -94,6 +99,36 @@ export function ReportScreen() {
           />
         </div>
       </div>
+
+      {pilot && (
+        <section
+          aria-labelledby="pilot-heading"
+          className="space-y-2 rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-950/40 to-black p-4"
+        >
+          <h3 id="pilot-heading" className="text-lg font-semibold">
+            Pilot rating: {pilot.score}/100 · {pilot.title}
+          </h3>
+          <p className="text-sm text-slate-400">
+            How well you flew the mission yourself. It is separate from the mission score above,
+            which depends only on your design.
+          </p>
+          <ul className="space-y-1 text-sm">
+            {pilot.games.map((g) => (
+              <li
+                key={g.id}
+                className="flex flex-wrap justify-between gap-2 border-t border-white/5 pt-1"
+              >
+                <span>
+                  <span className="font-medium">{g.label}</span>
+                  {g.autopilot && <span className="text-slate-400"> (autopilot)</span>}
+                  <span className="block text-xs text-slate-400">{g.summary}</span>
+                </span>
+                <span className="font-mono">{g.score}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section aria-labelledby="why-heading" className="space-y-2">
         <h3 id="why-heading" className="text-lg font-semibold">
@@ -176,6 +211,13 @@ export function ReportScreen() {
           </ul>
         </section>
       )}
+
+      <section aria-labelledby="trade-heading" className="space-y-2">
+        <h3 id="trade-heading" className="text-lg font-semibold">
+          Trade space: compare your designs
+        </h3>
+        <TradeSpaceChart scenarioId={run.design.scenarioId} currentId={currentId} />
+      </section>
 
       <Leaderboard />
     </div>

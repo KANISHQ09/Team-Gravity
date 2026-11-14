@@ -1,6 +1,6 @@
 import type { Catalog, ResourceKey } from '@gravity/shared';
 import { type Contribution, type DesignAnalysis, analyzeDesign } from '../models/analysis.ts';
-import { MARGIN_TARGET, REQUIRED_LINK_MARGIN_DB } from '../models/constants.ts';
+import { REQUIRED_LINK_MARGIN_DB, marginTarget } from '../models/constants.ts';
 import type { Design } from '@gravity/shared';
 
 export type GaugeStatus = 'ok' | 'warning' | 'over' | 'unknown';
@@ -47,7 +47,7 @@ export function computeBudgets(design: Design, catalog: Catalog): Gauge[] {
 
 export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
   const { scenario, design } = a.resolved;
-  const target = MARGIN_TARGET[design.difficulty];
+  const target = (k: ResourceKey) => marginTarget(design.difficulty, k);
   const critical = (k: ResourceKey) => scenario.criticalResource === k;
 
   const mass = maxGauge(
@@ -57,7 +57,7 @@ export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
       unit: 'kg',
       used: a.wetMassKg,
       limit: a.launchCapacityKg,
-      target,
+      target: target('mass'),
       critical: critical('mass'),
       why: 'The rocket can only lift so much to your orbit. Fuel counts too, and every kilogram you add needs more fuel to steer.',
       contributors: a.massContributions,
@@ -78,7 +78,7 @@ export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
       unit: 'W',
       used: a.powerConsumptionW,
       limit: a.powerGenerationW,
-      target,
+      target: target('power'),
       critical: critical('power'),
       why: 'Solar panels must make, on average over each orbit, all the power your parts use. Shadow and distance from the Sun reduce what they make.',
       contributors: a.powerContributions,
@@ -96,7 +96,7 @@ export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
       unit: 'M$',
       used: a.costM,
       limit: scenario.budgetM,
-      target,
+      target: target('budget'),
       critical: critical('budget'),
       why: 'Development, launch and operations all cost money. A real budget cut can force you to remove instruments.',
       contributors: a.costContributions,
@@ -114,7 +114,7 @@ export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
       unit: 'Gbit',
       used: a.storageNeedGbit,
       limit: a.storageGbit,
-      target,
+      target: target('data'),
       critical: critical('data'),
       why: 'Instruments keep producing data between ground-station contacts. The onboard recorder must hold it until the next contact, or data is lost.',
       contributors: a.dataContributions,
@@ -148,7 +148,7 @@ export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
       a.downlinkGbitPerDay > 0
         ? (a.downlinkGbitPerDay - a.dataGeneratedGbitPerDay) / a.downlinkGbitPerDay
         : null,
-    target,
+    target: target('comms'),
     status: commsStatus,
     critical: critical('comms'),
     why: `Science only counts once it reaches Earth. The downlink must carry everything the instruments produce, ideally with at least ${required} dB of link margin (twice what is needed).`,
@@ -166,7 +166,7 @@ export function gaugesFromAnalysis(a: DesignAnalysis): Gauge[] {
       unit: 'months',
       used: a.devMonths,
       limit: scenario.developmentMonths,
-      target,
+      target: target('time'),
       critical: critical('time'),
       why: 'Every part must be built and tested before the launch period. The slowest part sets the pace, and each extra part adds integration time.',
       contributors: a.devContributions,

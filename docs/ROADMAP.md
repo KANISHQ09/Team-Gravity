@@ -21,17 +21,18 @@
 
 **In the MVP:** every Must requirement except the items listed as follow-ups below.
 
-**Follow-ups (not built in Phase 8):**
+**Phase 9 (`feature/phase-9-polish`) built these follow-ups:** web lobby for online rooms (create/join by code, role claims, live design sync, proposals, GO/NO-GO, shared launch); engine in a Web Worker; offline play (PWA, installable); trade-space chart and "What matters most?" sensitivity view; balance fix so every mission is winnable at every difficulty (35% margins apply to physical resources, plus a rad-tolerant CubeSat computer); axe-core accessibility tests on every screen; per-screen page titles and app icon; [docs/SOLUTION.md](SOLUTION.md) describing the whole game; landing page with a video hero; **3D spacecraft hangar** (inspect, X-ray, deployment test) and **3D flight** with four playable mini-games (launch steering, orbit insertion, science + downlink, anomaly response) feeding a separate pilot rating.
 
-| Item | Why it was deferred | Requirement |
+**Still open:**
+
+| Item | Why | Requirement |
 | --- | --- | --- |
-| Web lobby for **online** rooms | Server side (REST + Socket.IO) is built and tested, with a typed event contract in `packages/shared/src/realtime.ts`; hot-seat co-op covers the 1–4 player requirement in the web app (planned cut line 5) | FR-13 (online part), FR-13b |
-| Engine in a Web Worker | The engine reviews a design in a few milliseconds, so it runs on the main thread for now | ARCHITECTURE §2 |
-| Offline service worker (PWA) | Autosave already keeps designs; offline loading needs `vite-plugin-pwa` | FR-12 (offline after first load) |
-| i18n (i18next), Radix UI, Recharts, Dexie | Not needed for the MVP; native HTML, SVG and localStorage cover it with fewer dependencies | TECH_STACK |
+| Web client for leave / remove / host-handover events | The server and the typed contract (`packages/shared/src/realtime.ts`) support them since `feature/server-realtime-contract`; the web lobby still offers only join and leave | FR-13b |
 | BullMQ jobs | Rooms expire through Redis TTLs and an in-process sweep, so no queue is needed yet. (Redis room state, the Socket.IO Redis adapter, leave/remove/host handover and the Postgres room archive were added on `feature/server-realtime-contract`.) | SRS-REL-03/04 |
-| Trade-space chart, sensitivity view, 3D views | Stretch items, first on the cut list | FR-19, FR-20 (3D) |
-| Playwright end-to-end and axe-core tests | Component tests cover the full loop with Testing Library; browser E2E next | SRS-TST |
+| i18n (i18next), Radix UI, Recharts, Dexie | Native HTML, SVG and localStorage cover the MVP with fewer dependencies | TECH_STACK |
+| GMAT-generated trajectories in the 3D flight | Stretch item; the 3D flight uses schematic distances today | SRS-VIZ-02 |
+| Playwright browser end-to-end tests | Component, accessibility, mini-game and Socket.IO tests cover the flows today | SRS-TST |
+| PNG app icons (192/512 px) | SVG icon works in modern browsers; some app stores need PNG | — |
 | Deployment (Vercel / Fly.io) | Needs team approval and accounts | — |
 
 ### Phase 2 decisions needed

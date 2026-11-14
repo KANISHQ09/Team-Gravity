@@ -1,37 +1,18 @@
-import { catalog } from '@gravity/engine';
-import { type DesignEdit, ROLE_INFO } from '@gravity/shared';
+import { ROLE_INFO } from '@gravity/shared';
 import { Button } from '../../components/ui.tsx';
 import { useGame } from '../../store/game.ts';
+import { useOnline } from '../../store/online.ts';
+import { describeEdit } from './describeEdit.ts';
+import { OnlineTeamBar } from './OnlineTeamBar.tsx';
 
-function describeEdit(edit: DesignEdit): string {
-  const name = (id: string | null) =>
-    id === null
-      ? 'nothing'
-      : ((
-          catalog.parts.find((p) => p.id === id) ??
-          catalog.orbits.find((o) => o.id === id) ??
-          catalog.launchVehicles.find((v) => v.id === id)
-        )?.name ?? id);
-  switch (edit.type) {
-    case 'addPart':
-      return `add ${name(edit.partId)}`;
-    case 'removePart':
-      return `remove ${name(edit.partId)}`;
-    case 'setOrbit':
-      return `change the orbit to ${name(edit.orbitId)}`;
-    case 'setLaunchVehicle':
-      return `change the rocket to ${name(edit.launchVehicleId)}`;
-    case 'setGoals':
-      return `change the science goals (${edit.goalIds.length} selected)`;
-    case 'setGroundStations':
-      return `use ${edit.count} ground station(s)`;
-    case 'setMitigations':
-      return 'change the risk reserves';
-  }
+/** Team bar: the online room when connected, otherwise hot-seat co-op (FR-13, FR-13a). */
+export function TeamBar() {
+  const online = useOnline((s) => s.active);
+  return online ? <OnlineTeamBar /> : <HotSeatBar />;
 }
 
 /** Hot-seat co-op: whose turn it is, their roles, and pending proposals (FR-13a). */
-export function TeamBar() {
+function HotSeatBar() {
   const players = useGame((s) => s.players);
   const active = useGame((s) => s.activePlayer);
   const proposals = useGame((s) => s.proposals);

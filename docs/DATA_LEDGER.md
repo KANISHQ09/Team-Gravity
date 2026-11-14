@@ -60,7 +60,8 @@ Engine constants live in `packages/engine/src/models/constants.ts`, each with it
 
 | Asset | Source | License | Attribution text | Status |
 | --- | --- | --- | --- | --- |
-| — | — | — | — | — |
+| Landing-page background video (`apps/web/public/media/hero-space.mp4`, poster `hero-poster.jpg`; re-encoded without audio) | **AI-generated** by the team with an AI video tool (original file `space.mp4`). It is an artistic render, not NASA footage; the capsule shown is not a real NASA vehicle | Team-owned, subject to the AI tool's terms of use (check they allow public, non-commercial use and record the tool name here) | "Background video: AI-generated" (shown in the site footer) | ✅ (record the tool name) |
+| 3D planets, stars, spacecraft and rocket | Generated in code by the team (procedural shaders; no image files) | MIT (this repository) | — | ✅ |
 
 Use only public-domain, NASA-licensed or openly licensed media. Never use the NASA insignia ("meatball"), logotype ("worm") or other NASA identifiers, which are not in the public domain, or anything that implies endorsement.
 

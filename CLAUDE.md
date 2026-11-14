@@ -10,7 +10,7 @@ Read before coding (in this order): [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVER
 
 **Current phase:** Phase 8 MVP built (see [docs/ROADMAP.md](docs/ROADMAP.md), "Phase 8 status" lists the follow-ups). New work goes in small tasks on `feature/*` branches. CI (`.github/workflows/ci.yml`) runs the same checks as `pnpm check` plus `pnpm audit --audit-level high`; keep both green.
 
-**Game balance is tested:** `packages/engine/tests/fixtures/designs.ts` holds three reference designs per scenario that must each score ≥ 85 (SRS-SCR-06). If you change catalog numbers or engine formulas, run `pnpm --filter @gravity/engine test` and keep that test passing; don't loosen it.
+**Game balance is tested:** `packages/engine/tests/fixtures/designs.ts` holds three reference designs per scenario that must each score ≥ 85 (SRS-SCR-06), and the tests also require every scenario to be winnable at every difficulty (`FLIGHT_DIRECTOR_CUBESAT` covers the CubeSat at Flight Director). If you change catalog numbers or engine formulas, run `pnpm --filter @gravity/engine test` and keep that test passing; don't loosen it.
 
 ## 2. Commands
 
