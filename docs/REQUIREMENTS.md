@@ -112,5 +112,5 @@ Accounts and sign-in, teacher dashboard, scenario editor, AI coach, live NASA da
 ## 5. Open questions (deferred)
 
 - Judging criteria and submission format.
-- License terms for GMAT outputs and Mission Viz code.
-- Project license (see [ROADMAP](ROADMAP.md), Phase 2 decisions).
+
+**Resolved:** project license is MIT (see [ROADMAP](ROADMAP.md), Phase 2). Source terms are recorded in [DATA_LEDGER](DATA_LEDGER.md): GMAT is Apache-2.0; Mission Viz has no license, so it is reference only.

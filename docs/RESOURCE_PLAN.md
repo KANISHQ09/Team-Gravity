@@ -11,7 +11,7 @@
 | **Mission Design Lab** (NASA) | Co-op roles work like an MDL study team; its four study tiers line up with the difficulty levels; the Master Equipment List and cost views | No |
 | **CubeSat 101** (CSLI) | Beginner CubeSat scenario, tutorial wording, glossary | No |
 | **GMAT** | Run offline to export Δv budgets, transfer times and trajectory samples to JSON (`tools/gmat/`) | No (offline, stretch) |
-| **NASA Mission Viz** | Reference for turning GMAT data into the replay view | No (check its license before reusing any code) |
+| **NASA Mission Viz** | Reference for turning GMAT data into the replay view | No. Its repository has no license, so its code must not be copied (see DATA_LEDGER SRC-08) |
 | **A Learning Game About Telescopes** (NASA) | Patterns: objectives first, disabled options with a reason, level progression, similar real missions in the report | No |
 | **VR Mission Visualization** (2023 Space Apps challenge) | Confirms what the replay needs: concept, trajectory, timeline, 3D | No |
 | **CSA digital games and activities** | Ideas for age-appropriate educational design | No |

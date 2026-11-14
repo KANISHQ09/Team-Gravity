@@ -15,21 +15,25 @@
 
 ## 2. Sources
 
-Status: ✅ terms checked · ⏳ to check · ❌ not usable.
+Status: ✅ terms checked · 🔒 reference only (no reuse allowed or planned) · ⏳ to check · ❌ not usable.
+
+Links are taken from the official challenge **Resources** tab: <https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/?tab=resources> (checked 2026-11-14). That page states: *"NASA does not endorse any non-U.S. Government entity and is not responsible for information contained on non-U.S. Government websites. For non-U.S. Government websites, participants must comply with any data use parameters of that specific website."*
+
+**NASA content in general** ([NASA Images and Media Usage Guidelines](https://www.nasa.gov/nasa-brand-center/images-and-media/)): NASA content is generally not subject to copyright in the United States and may be used in a factual manner that does not imply endorsement. The NASA insignia, logotype and identifiers are **not** in the public domain and must not be used. Third-party material inside NASA documents (marked as such) keeps its own copyright. Rows below marked "NASA guidelines" follow these rules.
 
 | ID | Source | Link | Terms / license | Used for | Label | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| SRC-01 | NASA Space Apps 2026 challenge statement | `resources/challenge.docx` (NASA Space Apps challenge page) | Challenge material | Requirements, scope | — | ✅ |
-| SRC-02 | Space Apps resources guide | `resources/resource.docx` | Challenge material; "follow each website's data-use terms"; NASA does not endorse non-U.S. Government entities | Resource list | — | ✅ |
-| SRC-03 | NASA, *Design and Develop Science Missions* | ⏳ add URL | ⏳ | Six-stage flow, four mission segments, ConOps, verification methods | — (concepts) | ⏳ |
-| SRC-04 | JPL, *Concept Maturity Levels* (Wessen et al.) | ⏳ add URL | ⏳ | Difficulty tiers, readiness checklist, 35% margin policy, 5×5 risk matrix | `NASA` (margin values) | ⏳ |
-| SRC-05 | NASA Mission Design Lab | ⏳ add URL | ⏳ | Co-op roles, study tiers, MEL and cost views | — (concepts) | ⏳ |
-| SRC-06 | *CubeSat 101* (CSLI) | ⏳ add URL | ⏳ | CubeSat scenario, tutorial wording, glossary | — / `NASA` | ⏳ |
-| SRC-07 | GMAT (General Mission Analysis Tool) | ⏳ add URL | ⏳ check license of the tool and its outputs | Δv budgets, transfer times, trajectory samples (stretch) | `NASA/GMAT` | ⏳ |
-| SRC-08 | NASA Mission Viz | ⏳ add URL | ⏳ check repository license **before copying any code** | Reference for the replay view | — | ⏳ |
-| SRC-09 | NASA, *A Learning Game About Telescopes* | ⏳ add URL | ⏳ | Design patterns only (no assets copied) | — | ⏳ |
-| SRC-10 | 2023 Space Apps challenge, *Visualize a Space Mission Using VR* | ⏳ add URL | ⏳ | Replay requirements (concept, trajectory, timeline) | — | ⏳ |
-| SRC-11 | Canadian Space Agency, digital games and activities | ⏳ add URL | ⏳ | Educational-design inspiration only | — | ⏳ |
+| SRC-01 | NASA Space Apps 2026 challenge statement | [Challenge page](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/) · copy in `resources/challenge.docx` | Challenge material, used to define scope | Requirements, scope | — | ✅ |
+| SRC-02 | Space Apps challenge Resources tab | [Resources tab](https://www.spaceappschallenge.org/2026/challenges/space-mission-design-game/?tab=resources) · summary in `resources/resource.docx` | Challenge material; comply with each linked site's data-use terms (quoted above) | Resource list | — | ✅ |
+| SRC-03 | NASA, *Design and Develop Science Missions* (webinar slides, Mar 2025) | [PDF](https://www.nasa.gov/wp-content/uploads/2025/04/250323-design-and-develop-science-mission.pdf?emrc=a454cf) | NASA guidelines; concepts only, no slides or images copied | Six-stage flow, four mission segments, ConOps, verification methods | — (concepts) | ✅ |
+| SRC-04 | Wessen, Borden, Ziemer, Kwok (2013), *Space mission concept development using concept maturity levels*, AIAA SPACE 2013 (JPL) | [JPL Open Repository](https://dataverse.jpl.nasa.gov/dataset.xhtml?persistentId=hdl:2014/44299) · <https://hdl.handle.net/2014/44299> | **CC0 1.0**; repository asks for citation (use the citation in this row) | Difficulty tiers, readiness checklist, 35% margin policy, 5×5 risk matrix | `NASA` (margin values) | ✅ |
+| SRC-05 | NASA Goddard, *Mission Design Lab (MDL)* | [MDL page](https://etd.gsfc.nasa.gov/capabilities/integrated-design-center/mission-design-lab/) | NASA guidelines; concepts only | Co-op roles, study tiers, MEL and cost views | — (concepts) | ✅ |
+| SRC-06 | NASA CSLI, *CubeSat 101: Basic Concepts and Processes for First-Time CubeSat Developers* | [PDF](https://www3.nasa.gov/sites/default/files/atoms/files/nasa_csli_cubesat_101_508.pdf) | NASA guidelines; paraphrase only. Don't copy figures without checking each one's credit line (some may be third-party) | CubeSat scenario, tutorial wording, glossary | — / `NASA` | ✅ |
+| SRC-07 | NASA, *General Mission Analysis Tool (GMAT)* | [NASA software catalog](https://software.nasa.gov/software/GSC-19468-1) · [source](https://github.com/nasa/GMAT) | **Apache-2.0** (MIT-compatible). We run it offline; only its numeric outputs enter the game | Δv budgets, transfer times, trajectory samples (stretch) | `NASA/GMAT` | ✅ |
+| SRC-08 | NASA, *Mission Viz* | [Site](https://nasa.github.io/mission-viz/) · [repo](https://github.com/nasa/mission-viz) | **No license file in the repository** (checked 2026-11-14), so the code is all-rights-reserved by default. **Do not copy its code or assets**; link to it and learn from its approach only | Reference for the replay view | — | 🔒 |
+| SRC-09 | NASA Webb, *A Learning Game About Telescopes* (Build It Yourself) | [Game](https://science.nasa.gov/mission/webb/game-build-it-yourself/) | NASA guidelines; design patterns only, no assets copied | Objectives-first flow, disabled options with reasons, real-mission match | — | ✅ |
+| SRC-10 | 2023 NASA Space Apps challenge, *Visualize a Space Mission Using Virtual Reality* | [Challenge page](https://www.spaceappschallenge.org/2023/challenges/visualize-a-space-mission-using-virtual-reality/) | Challenge material; ideas only | Replay requirements (concept, trajectory, timeline) | — | ✅ |
+| SRC-11 | Canadian Space Agency, *Digital Games and Activities* | [CSA page](https://www.asc-csa.gc.ca/eng/youth-educators/digital-games-and-activities.asp) | Government of Canada site terms (not reviewed in detail). Inspiration only; **nothing is copied**, so no reuse terms apply. Review before reusing anything | Educational-design inspiration | — | 🔒 |
 
 ## 3. Constants and datasets
 
@@ -50,7 +54,7 @@ Fill in as catalog files are created in `packages/catalog/data/`.
 | --- | --- | --- | --- | --- |
 | — | — | — | — | — |
 
-Use only public-domain, NASA-licensed or openly licensed media. Never use the NASA logo ("meatball" or "worm") or anything that implies endorsement.
+Use only public-domain, NASA-licensed or openly licensed media. Never use the NASA insignia ("meatball"), logotype ("worm") or other NASA identifiers, which are not in the public domain, or anything that implies endorsement.
 
 ## 5. Required disclaimer
 
