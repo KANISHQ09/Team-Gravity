@@ -1,0 +1,119 @@
+[
+  {
+    "id": "cubesat-earth-observer",
+    "name": "CubeSat Earth Observer",
+    "summary": "Build a tiny satellite to watch our own planet from low Earth orbit.",
+    "objective": "A school science club wants a low-cost satellite that maps farmland, photographs coastlines and checks the radiation environment above Earth. Everything must fit a CubeSat budget.",
+    "body": "earth",
+    "recommendedDifficulty": "explorer",
+    "goals": [
+      {
+        "id": "eo-land",
+        "title": "Map crops and forests",
+        "measurement": "multispectral-imaging",
+        "weight": 0.5
+      },
+      {
+        "id": "eo-coast",
+        "title": "Photograph coastlines and cities",
+        "measurement": "visible-imaging",
+        "weight": 0.3
+      },
+      {
+        "id": "eo-radiation",
+        "title": "Measure radiation in orbit",
+        "measurement": "radiation",
+        "weight": 0.2
+      }
+    ],
+    "allowedOrbitIds": ["leo-400", "leo-iss", "sso-550", "sso-dawn-dusk-600"],
+    "budgetM": 7,
+    "developmentMonths": 18,
+    "missionDays": 365,
+    "baselineScience": 300,
+    "thresholdScience": 150,
+    "criticalResource": "data",
+    "launchPeriodDays": 30,
+    "provenance": "GAME"
+  },
+  {
+    "id": "lunar-orbiter",
+    "name": "Lunar Orbiter",
+    "summary": "Send a spacecraft to orbit the Moon and map it for future explorers.",
+    "objective": "Future landers need to know where it is safe to land and where water ice might be hidden. Map the Moon's shape, find minerals and ice, and image candidate landing sites.",
+    "body": "moon",
+    "recommendedDifficulty": "engineer",
+    "goals": [
+      {
+        "id": "moon-topo",
+        "title": "Map the height of the surface",
+        "measurement": "altimetry",
+        "weight": 0.35
+      },
+      {
+        "id": "moon-ice",
+        "title": "Find minerals and water ice",
+        "measurement": "spectroscopy",
+        "weight": 0.4
+      },
+      {
+        "id": "moon-sites",
+        "title": "Image landing sites in detail",
+        "measurement": "visible-imaging",
+        "weight": 0.25
+      }
+    ],
+    "allowedOrbitIds": ["llo-50", "llo-100", "lunar-polar-100", "lunar-elliptical"],
+    "budgetM": 300,
+    "developmentMonths": 36,
+    "missionDays": 365,
+    "baselineScience": 650,
+    "thresholdScience": 325,
+    "criticalResource": "mass",
+    "launchPeriodDays": 20,
+    "provenance": "GAME"
+  },
+  {
+    "id": "mars-orbiter",
+    "name": "Mars Orbiter",
+    "summary": "Design an orbiter to search Mars for buried water and study its thin atmosphere.",
+    "objective": "Mars may hide ice under its surface and has lost most of its atmosphere. Search for subsurface ice, study the atmosphere and magnetic fields, and image the surface, all from about 225 million kilometres away.",
+    "body": "mars",
+    "recommendedDifficulty": "flight-director",
+    "goals": [
+      {
+        "id": "mars-ice",
+        "title": "Search for buried water ice",
+        "measurement": "radar-sounding",
+        "weight": 0.4
+      },
+      {
+        "id": "mars-air",
+        "title": "Study the thin atmosphere",
+        "measurement": "spectroscopy",
+        "weight": 0.3
+      },
+      {
+        "id": "mars-field",
+        "title": "Measure ancient magnetic fields",
+        "measurement": "magnetic-field",
+        "weight": 0.15
+      },
+      {
+        "id": "mars-surface",
+        "title": "Image the surface",
+        "measurement": "visible-imaging",
+        "weight": 0.15
+      }
+    ],
+    "allowedOrbitIds": ["mars-lmo-300", "mars-sso-400", "mars-elliptical", "mars-high-6000"],
+    "budgetM": 650,
+    "developmentMonths": 48,
+    "missionDays": 687,
+    "baselineScience": 1200,
+    "thresholdScience": 600,
+    "criticalResource": "comms",
+    "launchPeriodDays": 20,
+    "provenance": "GAME"
+  }
+]

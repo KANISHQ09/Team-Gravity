@@ -8,14 +8,31 @@
 
 | Phase | Goal | Outputs | Gate |
 | --- | --- | --- | --- |
-| **1 Planning** ✅ drafted | Understand the project | `docs/PROJECT_OVERVIEW.md`, `REQUIREMENTS.md`, `FEATURES.md`, `TECH_STACK.md` (approved), `ARCHITECTURE.md`, `ROADMAP.md`, `RESOURCE_PLAN.md` | Tech stack ✅ approved (full Gravity.md stack); ⛔ requirements review pending |
-| **2 Repository** | Repo basics | `.gitignore`, `.editorconfig`, `.gitattributes`; branch strategy decided ✅ License MIT, `main` + `feature/*`, public; `.gitignore`, `.gitattributes`, `.editorconfig` added |
-| **3 Folder structure** | Skeleton [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md): `apps/web`, `apps/server`, `packages/{shared,catalog,engine}`, `tools/`, each with a README | ✅ Approved (2026-11-14); skeleton created |
+| **1 Planning** ✅ | Understand the project | `docs/PROJECT_OVERVIEW.md`, `REQUIREMENTS.md`, `FEATURES.md`, `TECH_STACK.md` (approved), `ARCHITECTURE.md`, `ROADMAP.md`, `RESOURCE_PLAN.md` | ✅ Tech stack approved; requirements approved by the team when Phase 8 was started (2026-11-14) |
+| **2 Repository** ✅ | Repo basics | `.gitignore`, `.editorconfig`, `.gitattributes`; branch strategy | ✅ License MIT, `main` + `feature/*`, public |
+| **3 Folder structure** ✅ | Skeleton | [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md): `apps/web`, `apps/server`, `packages/{shared,catalog,engine}`, `tools/`, each with a README | ✅ Approved (2026-11-14); skeleton created |
 | **4 Documentation** | Community files | `README.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, issue templates, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md`, `.github/CODEOWNERS` | ✅ Drafted (2026-11-14); review |
-| **5 Dev environment** | Tooling | pnpm + Turborepo workspace, TypeScript configs, ESLint, Prettier, Vitest, Docker Compose (Postgres 16 + Redis), Drizzle config, `.env.example` | ✅ Done (2026-11-14): lint, format, typecheck, test and build pass. Deferred: Playwright (with the first E2E flow), migration `0001_init` (with the schema, Phase 8). Team creates Neon/Upstash accounts |
+| **5 Dev environment** | Tooling | pnpm + Turborepo workspace, TypeScript configs, ESLint, Prettier, Vitest, Docker Compose (Postgres 16 + Redis), Drizzle config, `.env.example` | ✅ Done (2026-11-14): lint, format, typecheck, test and build pass. Deferred: Playwright (with the first E2E flow). The first migration was generated in Phase 8 as `0000_init.sql` (Drizzle numbers from 0000). Team creates Neon/Upstash accounts |
 | **6 Claude Code config** | Rules for Claude | Root `CLAUDE.md`: development rules, coding standards, **strict Git restrictions**; `.claude/settings.json` deny rules that block Git/GitHub write commands | ✅ Done (2026-11-14); deny rules verified live |
-| **7 Validation** | Everything works | `.github/workflows/ci.yml` (lint, format, typecheck, test, build, `pnpm audit` high+) and `codeql.yml`, `dependabot.yml`; actions pinned to commit SHAs; validation only (no deploy, no merge). Local run: frozen install + `pnpm check` + audit pass; secret scan clean; stale docs fixed; Git deny rules extended to 100 | ✅ Done locally (2026-11-14); CI's first real run happens after push. ⛔ Approve the start of feature work |
-| **8 Development** | Build features | Small tasks, one per branch, PRs raised manually | Per PR |
+| **7 Validation** | Everything works | `.github/workflows/ci.yml` (lint, format, typecheck, test, build, `pnpm audit` high+) and `codeql.yml`, `dependabot.yml`; actions pinned to commit SHAs; validation only (no deploy, no merge). Local run: frozen install + `pnpm check` + audit pass; secret scan clean; stale docs fixed; Git deny rules extended to 100 | ✅ Done (2026-11-14); CI green on `main` |
+| **8 Development** | Build the MVP | Built as one PR on `feature/phase-8-mvp` (team decision): shared domain + API schemas, catalog (3 scenarios, 40 parts, 5 rockets, 13 orbits, 9 NASA analogs), deterministic engine, six-stage web flow with hot-seat co-op, server API with guest auth, Postgres scores, leaderboards and Socket.IO rooms | ✅ MVP built and verified locally (2026-11-14): 70 tests incl. Postgres, lint, typecheck, build. See "Phase 8 status" below |
+
+### Phase 8 status: what is in, what is next
+
+**In the MVP:** every Must requirement except the items listed as follow-ups below.
+
+**Follow-ups (not built in Phase 8):**
+
+| Item | Why it was deferred | Requirement |
+| --- | --- | --- |
+| Web lobby for **online** rooms | Server side (REST + Socket.IO) is built and tested; hot-seat co-op covers the 1–4 player requirement in the web app (planned cut line 5) | FR-13 (online part), FR-13b |
+| Engine in a Web Worker | The engine reviews a design in a few milliseconds, so it runs on the main thread for now | ARCHITECTURE §2 |
+| Offline service worker (PWA) | Autosave already keeps designs; offline loading needs `vite-plugin-pwa` | FR-12 (offline after first load) |
+| i18n (i18next), Radix UI, Recharts, Dexie | Not needed for the MVP; native HTML, SVG and localStorage cover it with fewer dependencies | TECH_STACK |
+| Redis room state + Socket.IO Redis adapter, BullMQ jobs | One server instance holds rooms in memory; Redis is used for rate limits and readiness | SRS-REL-03/04 |
+| Trade-space chart, sensitivity view, 3D views | Stretch items, first on the cut list | FR-19, FR-20 (3D) |
+| Playwright end-to-end and axe-core tests | Component tests cover the full loop with Testing Library; browser E2E next | SRS-TST |
+| Deployment (Vercel / Fly.io) | Needs team approval and accounts | — |
 
 ### Phase 2 decisions needed
 
@@ -69,7 +86,7 @@ Times are relative to the team's kickoff (T+0). Detail: Gravity.md §4.3.
 
 ## Pre-development checklist
 
-- [ ] Project requirements finalized (drafted, awaiting review)
+- [x] Project requirements finalized (approved when Phase 8 started)
 - [x] Technology stack approved (full Gravity.md stack, 2026-11-14)
 - [x] Architecture documented (draft)
 - [x] Folder structure approved

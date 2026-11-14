@@ -34,19 +34,27 @@ Links are taken from the official challenge **Resources** tab: <https://www.spac
 | SRC-09 | NASA Webb, *A Learning Game About Telescopes* (Build It Yourself) | [Game](https://science.nasa.gov/mission/webb/game-build-it-yourself/) | NASA guidelines; design patterns only, no assets copied | Objectives-first flow, disabled options with reasons, real-mission match | — | ✅ |
 | SRC-10 | 2023 NASA Space Apps challenge, *Visualize a Space Mission Using Virtual Reality* | [Challenge page](https://www.spaceappschallenge.org/2023/challenges/visualize-a-space-mission-using-virtual-reality/) | Challenge material; ideas only | Replay requirements (concept, trajectory, timeline) | — | ✅ |
 | SRC-11 | Canadian Space Agency, *Digital Games and Activities* | [CSA page](https://www.asc-csa.gc.ca/eng/youth-educators/digital-games-and-activities.asp) | Government of Canada site terms (not reviewed in detail). Inspiration only; **nothing is copied**, so no reuse terms apply. Review before reusing anything | Educational-design inspiration | — | 🔒 |
+| SRC-12 | NASA Science mission pages (Landsat 9, Terra, Van Allen Probes, ICESat-2, LRO, LADEE, MRO, MAVEN, Mars Global Surveyor) | e.g. [LRO](https://science.nasa.gov/mission/lro/); full URLs in `packages/catalog/data/analogs.json` (each checked 2026-11-14) | NASA guidelines; facts summarised in our own words, linked, no images copied | "Real NASA missions like yours" in the report | `NASA` | ✅ |
+| SRC-13 | NASA NSSDCA, *Earth Fact Sheet* | [Fact sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html) (checked 2026-11-14: "Solar irradiance (W/m²) 1361.0") | NASA guidelines; one value used | Solar constant for solar-power calculations | `NASA` | ✅ |
 
 ## 3. Constants and datasets
 
-Fill in as catalog files are created in `packages/catalog/data/`.
+Engine constants live in `packages/engine/src/models/constants.ts`, each with its label and a note. Catalog values live in `packages/catalog/data/*.json`, each entry with a `provenance` field.
 
 | Constant / dataset | Value | Label | Source ID | File |
 | --- | --- | --- | --- | --- |
-| Standard gravity g₀ | 9.80665 m/s² | `DERIVED` (standard definition) | — | `packages/engine/src/models` |
-| Solar constant at 1 AU | 1361 W/m² | `NASA` | ⏳ | `packages/engine/src/models` |
-| Launch-vehicle classes (small / medium / heavy / super-heavy) | ⏳ | `GAME` | — | `packages/catalog/data/launch-vehicles.json` |
-| Orbits (LEO, SSO, GEO, lunar low, Mars low, Mars elliptical) | ⏳ | `DERIVED` / `GAME` | — | `packages/catalog/data/orbits.json` |
-| Instruments and subsystem parts | ⏳ | `GAME` | — | `packages/catalog/data/parts.json` |
-| Analog (real) NASA missions | ⏳ about 10, each fact checked | `NASA` | ⏳ | `packages/catalog/data/analogs.json` |
+| Standard gravity g₀ | 9.80665 m/s² | `DERIVED` (standard definition) | — | `packages/engine/src/models/constants.ts` |
+| Solar constant at 1 AU | 1361 W/m² | `NASA` | SRC-13 | `packages/engine/src/models/constants.ts` |
+| Required link margin | 3 dB | `NASA` | SRC-04 | `packages/engine/src/models/constants.ts` |
+| Margin targets by difficulty | 10% / 20% / 35% | `GAME` / `NASA` (35% from the CML 4 checklist) | SRC-04 | `packages/engine/src/models/constants.ts` |
+| Body gravity constants and radii (Earth, Moon, Mars) | standard values | `DERIVED` | — | `packages/engine/src/models/constants.ts` |
+| Array derating, battery depth of discharge, ops cost per station-day, event rates | see file | `GAME` | — | `packages/engine/src/models/constants.ts` |
+| Launch-vehicle classes (rideshare / small / medium / heavy / super-heavy) | 5 archetypes | `GAME` | — | `packages/catalog/data/launch-vehicles.json` |
+| Orbits (4 Earth + GEO, 4 lunar, 4 Mars) | 13 orbits; periods computed with Kepler's law | `GAME` (periods `DERIVED`) | — | `packages/catalog/data/orbits.json` |
+| Instruments and subsystem parts | 40 parts | `GAME` | — | `packages/catalog/data/parts.json` |
+| Scenarios (budgets, Baseline/Threshold science) | 3 scenarios, balance-tested | `GAME` | — | `packages/catalog/data/scenarios.json` |
+| Analog (real) NASA missions | 9 missions, each URL and fact checked | `NASA` | SRC-12 | `packages/catalog/data/analogs.json` |
+| Glossary | 20 terms, written by the team | — | — | `packages/catalog/data/glossary.json` |
 
 ## 4. Media assets (images, 3D models, icons, fonts, sounds)
 

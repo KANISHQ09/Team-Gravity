@@ -1,0 +1,101 @@
+[
+  {
+    "id": "landsat-9",
+    "name": "Landsat 9",
+    "body": "earth",
+    "launchYear": 2021,
+    "measures": ["multispectral-imaging"],
+    "summary": "Continues a decades-long record of Earth's land surface in many wavelengths, used to track crops, forests and cities.",
+    "url": "https://science.nasa.gov/mission/landsat-9/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "terra",
+    "name": "Terra",
+    "body": "earth",
+    "launchYear": 1999,
+    "measures": ["multispectral-imaging", "visible-imaging"],
+    "summary": "An Earth-observing satellite whose instruments image land, oceans and the atmosphere in many wavelengths.",
+    "url": "https://science.nasa.gov/mission/terra/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "van-allen-probes",
+    "name": "Van Allen Probes",
+    "body": "earth",
+    "launchYear": 2012,
+    "measures": ["radiation", "magnetic-field"],
+    "summary": "Twin spacecraft that studied the radiation belts surrounding Earth.",
+    "url": "https://science.nasa.gov/mission/van-allen-probes/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "icesat-2",
+    "name": "ICESat-2",
+    "body": "earth",
+    "launchYear": 2018,
+    "measures": ["altimetry"],
+    "summary": "Uses a laser altimeter to measure the height of ice sheets, sea ice, forests and land.",
+    "url": "https://science.nasa.gov/mission/icesat-2/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "lro",
+    "name": "Lunar Reconnaissance Orbiter (LRO)",
+    "body": "moon",
+    "launchYear": 2009,
+    "measures": ["altimetry", "visible-imaging", "spectroscopy", "radiation"],
+    "summary": "Maps the Moon in detail from a low orbit, including its topography, landing sites and cold polar craters.",
+    "url": "https://science.nasa.gov/mission/lro/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "ladee",
+    "name": "LADEE",
+    "body": "moon",
+    "launchYear": 2013,
+    "measures": ["spectroscopy"],
+    "summary": "Studied the Moon's extremely thin atmosphere and the dust around it from lunar orbit.",
+    "url": "https://science.nasa.gov/mission/ladee/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "mro",
+    "name": "Mars Reconnaissance Orbiter (MRO)",
+    "body": "mars",
+    "launchYear": 2005,
+    "measures": ["visible-imaging", "spectroscopy", "radar-sounding"],
+    "summary": "Studies Mars with a high-resolution camera, a spectrometer and a radar that looks beneath the surface for ice.",
+    "url": "https://science.nasa.gov/mission/mars-reconnaissance-orbiter/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "maven",
+    "name": "MAVEN",
+    "body": "mars",
+    "launchYear": 2013,
+    "measures": ["spectroscopy", "magnetic-field"],
+    "summary": "Investigates Mars' upper atmosphere and how the planet lost most of its air to space.",
+    "url": "https://science.nasa.gov/mission/maven/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  },
+  {
+    "id": "mars-global-surveyor",
+    "name": "Mars Global Surveyor",
+    "body": "mars",
+    "launchYear": 1996,
+    "measures": ["altimetry", "magnetic-field", "visible-imaging"],
+    "summary": "Mapped Mars' shape with a laser altimeter and discovered magnetic fields frozen into the ancient crust.",
+    "url": "https://science.nasa.gov/mission/mars-global-surveyor/",
+    "provenance": "NASA",
+    "sourceId": "SRC-12"
+  }
+]

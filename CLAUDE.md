@@ -8,7 +8,9 @@ GRAVITY is a browser game for the NASA Space Apps Challenge 2026 (*Space Mission
 
 Read before coding (in this order): [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) · [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/FOLDER_STRUCTURE.md](docs/FOLDER_STRUCTURE.md) · [docs/TECH_STACK.md](docs/TECH_STACK.md) · [CONTRIBUTING.md](CONTRIBUTING.md). Detailed reference: [resources/Gravity.md](resources/Gravity.md) (large; read only the section you need).
 
-**Current phase:** project initialization complete through Phase 7 (see [docs/ROADMAP.md](docs/ROADMAP.md)). **Do not start feature development until the team explicitly approves Phase 8.** CI (`.github/workflows/ci.yml`) runs the same checks as `pnpm check` plus `pnpm audit --audit-level high`; keep both green.
+**Current phase:** Phase 8 MVP built (see [docs/ROADMAP.md](docs/ROADMAP.md), "Phase 8 status" lists the follow-ups). New work goes in small tasks on `feature/*` branches. CI (`.github/workflows/ci.yml`) runs the same checks as `pnpm check` plus `pnpm audit --audit-level high`; keep both green.
+
+**Game balance is tested:** `packages/engine/tests/fixtures/designs.ts` holds three reference designs per scenario that must each score ≥ 85 (SRS-SCR-06). If you change catalog numbers or engine formulas, run `pnpm --filter @gravity/engine test` and keep that test passing; don't loosen it.
 
 ## 2. Commands
 

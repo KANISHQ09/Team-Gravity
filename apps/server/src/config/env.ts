@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
 
 /**
@@ -11,13 +12,18 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  // Required once the database and Redis modules are implemented (Phase 8).
+  /** Optional: without it, scores and leaderboards are kept in memory. */
   DATABASE_URL: z.string().url().optional(),
+  /** Optional: without it, rate-limit counters are kept per instance. */
   REDIS_URL: z.string().url().optional(),
   JWT_SIGNING_KEY: z.string().min(32).optional(),
 });
 
-export type Env = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema> & {
+  /** Always set after loading: generated for development/test when not configured. */
+  readonly jwtKey: string;
+  readonly jwtKeyGenerated: boolean;
+};
 
 /**
  * `KEY=` lines in a .env file arrive as empty strings. Treat them as "not set"
@@ -35,5 +41,15 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
       .join('\n');
     throw new Error(`Invalid environment configuration:\n${problems}`);
   }
-  return result.data;
+  const env = result.data;
+  if (!env.JWT_SIGNING_KEY && env.NODE_ENV === 'production') {
+    throw new Error(
+      'Invalid environment configuration:\n  - JWT_SIGNING_KEY: required in production',
+    );
+  }
+  return {
+    ...env,
+    jwtKey: env.JWT_SIGNING_KEY ?? randomBytes(48).toString('base64url'),
+    jwtKeyGenerated: !env.JWT_SIGNING_KEY,
+  };
 }

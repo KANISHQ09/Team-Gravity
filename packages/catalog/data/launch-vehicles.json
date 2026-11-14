@@ -1,0 +1,47 @@
+[
+  {
+    "id": "lv-rideshare",
+    "name": "Rideshare slot",
+    "description": "Your CubeSat rides along with a bigger satellite. Very cheap, but only to low Earth orbit and only for tiny spacecraft.",
+    "costM": 1.5,
+    "reliability": 0.95,
+    "capacityKg": { "leo": 25, "sso": 20, "geo": 0, "lunar": 0, "mars": 0 },
+    "provenance": "GAME"
+  },
+  {
+    "id": "lv-small",
+    "name": "Small launcher",
+    "description": "A dedicated small rocket. Takes a few hundred kilograms to Earth orbit and a very light probe towards the Moon.",
+    "costM": 8,
+    "reliability": 0.95,
+    "capacityKg": { "leo": 500, "sso": 400, "geo": 0, "lunar": 60, "mars": 0 },
+    "provenance": "GAME"
+  },
+  {
+    "id": "lv-medium",
+    "name": "Medium launcher",
+    "description": "A workhorse rocket. Can send a medium spacecraft to the Moon or a light one to Mars.",
+    "costM": 60,
+    "reliability": 0.98,
+    "capacityKg": { "leo": 8000, "sso": 6000, "geo": 3000, "lunar": 1500, "mars": 1000 },
+    "provenance": "GAME"
+  },
+  {
+    "id": "lv-heavy",
+    "name": "Heavy launcher",
+    "description": "A large rocket for heavy deep-space missions. Expensive, but it opens up big Mars orbiters.",
+    "costM": 120,
+    "reliability": 0.985,
+    "capacityKg": { "leo": 20000, "sso": 16000, "geo": 8000, "lunar": 5000, "mars": 4000 },
+    "provenance": "GAME"
+  },
+  {
+    "id": "lv-superheavy",
+    "name": "Super-heavy launcher",
+    "description": "The biggest rocket class. Huge capacity at a huge price: rarely the efficient choice for one science spacecraft.",
+    "costM": 300,
+    "reliability": 0.97,
+    "capacityKg": { "leo": 60000, "sso": 50000, "geo": 25000, "lunar": 20000, "mars": 15000 },
+    "provenance": "GAME"
+  }
+]

@@ -71,7 +71,11 @@ Locked by `pnpm-lock.yaml`. Notable choices:
 | Fastify / Zod / Drizzle | 5.x / 4.x / 0.45.x | Current releases |
 | tsup | 9.x | Bundles the server with the internal `@gravity/*` TypeScript packages |
 
-**Installed now (only what the scaffold uses):** turbo, typescript, eslint + plugins, prettier, vitest, react, react-dom, vite, tailwindcss, testing-library, jsdom, fastify, zod, drizzle-orm, drizzle-kit, postgres, tsx, tsup. **Installed later, with the feature that needs it:** Zustand, Radix UI, Recharts, react-three-fiber, Framer Motion, Socket.IO, ioredis, BullMQ, Dexie, vite-plugin-pwa, i18next, Sentry, PostHog, fast-check, Playwright, Testcontainers, axe-core.
+**Installed in Phase 5 (scaffold):** turbo, typescript, eslint + plugins, prettier, vitest, react, react-dom, vite, tailwindcss, testing-library, jsdom, fastify, zod, drizzle-orm, drizzle-kit, postgres, tsx, tsup.
+
+**Added in Phase 8 (MVP):** `zustand` (web state + autosave), `socket.io` / `socket.io-client` (co-op rooms; client for tests), `@fastify/jwt`, `@fastify/cookie`, `@fastify/cors`, `@fastify/rate-limit` (guest auth, CORS, abuse limits), `ioredis` (Redis rate-limit store and readiness check), `fast-check` (property tests for determinism). All MIT licensed.
+
+**Not used yet (deferred, see ROADMAP "Phase 8 status"):** Radix UI, Recharts, react-three-fiber, Framer Motion, BullMQ, Dexie, vite-plugin-pwa, i18next, Sentry, PostHog, Playwright, Testcontainers, axe-core. The MVP uses native HTML, SVG and localStorage instead, to keep dependencies and the bundle small (web bundle: 112 KB gzipped).
 
 **Known audit findings (dev tooling only, 2 moderate):** `esbuild ≤ 0.24.2` pulled in by `drizzle-kit` (affects esbuild's dev server, which we don't use), and `minimatch < 11.0.1` pulled in by `typescript-eslint` (ReDoS on lint globs). Neither ships to users; re-check when those tools release fixes.
 

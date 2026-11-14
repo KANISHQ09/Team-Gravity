@@ -68,7 +68,7 @@ Team-Gravity/
 │       │   ├── jobs/                # BullMQ queues and workers
 │       │   └── db/
 │       │       ├── schema/          # Drizzle table definitions
-│       │       └── migrations/      # generated SQL migrations (0001_init…)
+│       │       └── migrations/      # generated SQL migrations (0000_init.sql, …)
 │       ├── tests/                   # integration tests (Testcontainers: Postgres + Redis)
 │       ├── Dockerfile
 │       └── package.json
