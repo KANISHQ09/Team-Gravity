@@ -64,6 +64,8 @@ pnpm services:up              # start local PostgreSQL + Redis (Docker)
 pnpm dev                      # web on http://localhost:5173, server on http://localhost:3000
 ```
 
+Everyone creates their own `.env` from `.env.example`; don't send `.env` files to each other (they are per machine and will hold secrets later). The defaults work as they are unless another Postgres or Redis already uses port 5432 or 6379 on your machine: then set `POSTGRES_PORT` / `REDIS_PORT` and the matching port in `DATABASE_URL` / `REDIS_URL` (see [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md)). Apply the database tables once with `pnpm --filter @gravity/server db:migrate`.
+
 | Command | What it does |
 | --- | --- |
 | `pnpm dev` | Starts the web app (Vite) and the server (tsx watch) together. If port 5173 is busy, use `pnpm --filter @gravity/web dev --port 5174` |
@@ -77,7 +79,7 @@ pnpm dev                      # web on http://localhost:5173, server on http://l
 | `pnpm --filter @gravity/server db:migrate` | Apply database migrations (needed once before using Postgres) |
 | `pnpm --filter @gravity/server db:generate` | Generate a new Drizzle migration after changing the schema |
 
-The server runs without Postgres or Redis: scores are then kept in memory. With `DATABASE_URL` and `REDIS_URL` set (see `.env.example`), it stores scores in Postgres and `/readyz` checks both. To run the Postgres integration test: `TEST_DATABASE_URL=postgres://gravity:gravity@localhost:5432/gravity pnpm --filter @gravity/server test`.
+The server runs without Postgres or Redis: scores are then kept in memory. With `DATABASE_URL` and `REDIS_URL` set (see `.env.example`), it stores scores in Postgres and `/readyz` checks both. With `REDIS_URL` set, co-op rooms are kept in Redis, shared across server instances and recovered after a restart. To run the Postgres and Redis integration tests: `TEST_DATABASE_URL=postgres://gravity:gravity@localhost:5432/gravity TEST_REDIS_URL=redis://localhost:6379/15 pnpm --filter @gravity/server test`.
 
 ## Environment variables
 

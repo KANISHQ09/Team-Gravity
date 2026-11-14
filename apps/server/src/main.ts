@@ -3,6 +3,7 @@ import { buildApp, type AppDeps } from './app.ts';
 import { loadEnv } from './config/env.ts';
 import { createDatabase } from './db/client.ts';
 import type { ReadinessProbe } from './modules/health/routes.ts';
+import { postgresRoomArchive } from './modules/rooms/archive.ts';
 import { postgresScoreRepository } from './modules/scores/repository.ts';
 
 const env = loadEnv();
@@ -13,6 +14,7 @@ const deps: { -readonly [K in keyof AppDeps]: AppDeps[K] } = {};
 if (env.DATABASE_URL) {
   const database = createDatabase(env.DATABASE_URL);
   deps.scores = postgresScoreRepository(database.db);
+  deps.roomArchive = postgresRoomArchive(database.db);
   probes.push({ name: 'postgres', check: database.ping });
   closers.push(database.close);
 }
@@ -40,7 +42,10 @@ process.on('SIGTERM', () => void shutdown('SIGTERM'));
 try {
   await app.listen({ host: env.HOST, port: env.PORT });
   app.log.info(
-    { storage: env.DATABASE_URL ? 'postgres' : 'memory', redis: env.REDIS_URL ? 'on' : 'off' },
+    {
+      storage: env.DATABASE_URL ? 'postgres' : 'memory',
+      rooms: env.REDIS_URL ? 'redis' : 'memory',
+    },
     'GRAVITY server ready',
   );
 } catch (error) {

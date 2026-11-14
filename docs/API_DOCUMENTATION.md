@@ -1,13 +1,13 @@
 # GRAVITY — API Documentation
 
-> Status: **✅ Implemented in Phase 8** (`apps/server`), with request/response schemas in `packages/shared/src/api.ts`. Covered by `apps/server/tests`. Not yet implemented: OpenAPI generation, `Idempotency-Key`, and the post-MVP endpoints listed below.
+> Status: **✅ Implemented in Phase 8** (`apps/server`), with request/response schemas in `packages/shared/src/api.ts` and the typed Socket.IO contract in `packages/shared/src/realtime.ts`. Covered by `apps/server/tests`. Not yet implemented: OpenAPI generation, `Idempotency-Key`, and the post-MVP endpoints listed below.
 >
 > Implementation notes:
 > - Validation: top-level request bodies are strict (unknown fields → 400); unknown fields *inside* a design are dropped.
-> - The room-creation limit (5/hour) is counted per client IP, because rate limiting runs before authentication.
+> - The room-creation limit (5/hour) is counted per guest (read from the bearer token); requests without a valid token are counted per IP.
 > - `POST /simulate` and `POST /scores` return **422** with an `issues` array (`code`, `message`, `why`, `fix`) for designs that cannot launch.
 > - Socket errors arrive as `room:error` `{ event, title, detail }`; a rejected patch arrives as `design:rejected` `{ title, reason, latestVersion }`.
-> - Rooms are held in memory on one server instance and removed after 30 idle minutes.
+> - Rooms live in Redis when `REDIS_URL` is set (shared by every server instance through the Socket.IO Redis adapter, and recovered after a restart), otherwise in memory on one instance. Either way they are removed after 30 idle minutes. Launched rooms are archived in Postgres (`rooms`, `room_members`, `designs`, `runs`) when `DATABASE_URL` is set.
 
 ## 1. Conventions
 
@@ -94,30 +94,45 @@ Join → `200 { "roomId": "…", "role": null }`, or `404` (unknown code), `409`
 
 ## 3. Socket.IO events (MVP)
 
-The connection handshake sends the access JWT (`auth: { token }`). Every payload is Zod-validated; at most 20 events/second per connection.
+The connection handshake sends the access JWT (`auth: { token }`). Every payload is Zod-validated and unknown fields are rejected; at most 20 events/second per connection.
+
+Types for every event live in `packages/shared/src/realtime.ts`. Type the web client with them so both sides stay in step:
+
+```ts
+import { io, type Socket } from 'socket.io-client';
+import type { ClientToServerEvents, ServerToClientEvents } from '@gravity/shared';
+import type { MissionResult } from '@gravity/engine';
+const socket: Socket<ServerToClientEvents<MissionResult>, ClientToServerEvents> =
+  io(API_URL, { auth: { token: accessToken } });
+```
 
 ### Client → server
 
 | Event | Payload | Notes |
 | --- | --- | --- |
-| `room:join` | `{ code }` | Server replies with `room:state` |
-| `role:claim` | `{ role }` | `mission-architect` · `spacecraft-engineer` · `science-lead` · `operations` |
-| `design:patch` | `{ path, value, baseVersion }` | Rejected if `path` isn't owned by the caller's role; becomes a proposal instead |
-| `proposal:create` | `{ path, value, message }` | `message` is chosen from preset texts (no free text) |
-| `proposal:respond` | `{ proposalId, accept }` | Only the owner of the path |
-| `vote:cast` | `{ vote: "go" \| "no-go", reason? }` | `reason` required for `no-go` (preset list) |
-| `sim:start` | `{}` | Host only; needs every player's GO and a passed readiness gate |
+| `room:join` | `{ code }` | Joins (or rejoins) the room; server broadcasts `room:state`. After launch, also sends `sim:result` to this player |
+| `room:leave` | none or `{}` | Leaves for good: frees the player's roles and drops their open proposals. If the host leaves, the earliest-joined player becomes host; the last player out closes the room |
+| `role:claim` | `{ roles: Role[] }` | `mission-architect` · `spacecraft-engineer` · `science-lead` · `operations`. Replaces the caller's roles; `Role taken` if another player holds one |
+| `design:patch` | `{ edit: DesignEdit, baseVersion }` | `edit` is one of the `DesignEdit` types in `packages/shared/src/edits.ts`. Rejected (`design:rejected`) if the edit belongs to another role, or if `baseVersion` is not the room's current version |
+| `proposal:create` | `{ edit, message }` | `message` is one of the preset `PROPOSAL_MESSAGES` (no free text) |
+| `proposal:respond` | `{ proposalId, accept }` | Only a holder of the edit's owning role |
+| `vote:cast` | `{ vote: "go" }` or `{ vote: "no-go", reason }` | `reason` is one of the preset `NO_GO_REASONS`. Any design change resets every vote |
+| `member:remove` | `{ userId }` | Host only, and only for a player offline for at least 2 minutes (`REJOIN_GRACE_SECONDS`, SRS-COL-06) |
+| `sim:start` | none or `{}` | Host only; needs every player's GO and a passed readiness review |
+
+A host who stays offline past the 2-minute grace period hands the host role to the earliest-joined online player on the next change in the room.
 
 ### Server → client
 
 | Event | Payload |
 | --- | --- |
-| `room:state` | Full snapshot: members, roles, design, version, votes, status |
-| `design:applied` | `{ path, value, version, budgets }` |
-| `design:rejected` | `{ path, reason, latestVersion }` |
-| `proposal:update` | `{ proposalId, status }` |
-| `vote:update` | `{ votes, allGo }` |
-| `sim:tick` | Progress during the shared run (optional) |
-| `sim:result` | Same shape as the `POST /simulate` response |
+| `room:state` | `RoomSnapshot`: `roomId, code, hostId, scenarioId, difficulty, status, design, version, members[] { userId, roles, vote, connected, isHost }, proposals[]` |
+| `design:applied` | `{ edit, version, design, by }` (also sent when a proposal is accepted) |
+| `design:rejected` | `{ title, reason, latestVersion }` |
+| `proposal:update` | `{ proposal, status: "open" \| "accepted" \| "rejected" }` |
+| `vote:update` | `{ votes: [{ userId, vote }], allGo }` |
+| `sim:result` | The engine's `MissionResult` `{ run, report }`, identical for every player |
+| `room:left` | `{ reason: "left" \| "removed" }`, sent to the player who is no longer in the room |
+| `room:error` | `{ event, title, detail }` |
 
 Version conflicts: if `baseVersion` is older than the room's version, the server returns `design:rejected` with the latest version and the client rebases.

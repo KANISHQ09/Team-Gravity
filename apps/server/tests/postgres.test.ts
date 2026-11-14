@@ -1,8 +1,11 @@
 import { randomUUID } from 'node:crypto';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
+import { runMission } from '@gravity/engine';
 import { describe, expect, it } from 'vitest';
 import { createDatabase } from '../src/db/client.ts';
-import { users } from '../src/db/schema/index.ts';
+import { roomMembers, rooms as rooms_, users } from '../src/db/schema/index.ts';
+import { postgresRoomArchive } from '../src/modules/rooms/archive.ts';
+import { RoomService } from '../src/modules/rooms/service.ts';
 import { postgresScoreRepository } from '../src/modules/scores/repository.ts';
 import { BALANCE_DESIGNS } from '../../../packages/engine/tests/fixtures/designs.ts';
 
@@ -50,6 +53,45 @@ describe.skipIf(!url)('Postgres score repository', () => {
     } finally {
       // Remove this test's rows (deleting the guest cascades to designs, runs and scores).
       await database.db.delete(users).where(eq(users.id, guestId));
+      await database.close();
+    }
+  });
+});
+
+describe.skipIf(!url)('Postgres room archive', () => {
+  it('saves a launched room with its members, design and run', async () => {
+    const database = createDatabase(url!);
+    const host = randomUUID();
+    const guest = randomUUID();
+    try {
+      const rooms = new RoomService();
+      const room = await rooms.create(host, 'mars-orbiter', 'engineer');
+      await rooms.join(room.code, guest);
+      const fixture = BALANCE_DESIGNS['mars-orbiter']![0]!.design;
+      const launched = {
+        ...(await rooms.claimRoles(room.id, host, ['mission-architect'])),
+        design: { ...fixture, difficulty: 'engineer' as const },
+        status: 'report' as const,
+        result: runMission(fixture, 7),
+      };
+      await postgresRoomArchive(database.db).save(launched, 7);
+      const [saved] = await database.db.select().from(rooms_).where(eq(rooms_.id, room.id));
+      expect(saved).toMatchObject({
+        code: room.code,
+        scenarioId: 'mars-orbiter',
+        status: 'report',
+      });
+      const members = await database.db
+        .select()
+        .from(roomMembers)
+        .where(eq(roomMembers.roomId, room.id));
+      expect(members.find((m) => m.userId === host)).toMatchObject({
+        isHost: true,
+        role: 'mission-architect',
+      });
+      expect(members).toHaveLength(2);
+    } finally {
+      await database.db.delete(users).where(inArray(users.id, [host, guest]));
       await database.close();
     }
   });

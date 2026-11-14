@@ -91,6 +91,6 @@ Both listen on `127.0.0.1` only. The `gravity`/`gravity` login is for local deve
 | Problem | Fix |
 | --- | --- |
 | `docker: command not found` | Open a new terminal after installing, and make sure Docker Desktop is running |
-| `port is already allocated` (5432 or 6379) | Another Postgres/Redis is running. Stop it, or change the left-hand port in `docker-compose.yml` **and** the URL in `.env` |
+| `port is already allocated` (5432 or 6379) | Another Postgres/Redis is running (for example a Homebrew `postgresql@16`). Stop it, or pick other ports in `.env`: `POSTGRES_PORT=5433` (and `DATABASE_URL=…@localhost:5433/gravity`) or `REDIS_PORT=6380` (and `REDIS_URL=redis://localhost:6380`), then `pnpm services:up` again |
 | Services start but the server can't connect | Check `.env` matches §2.5 and `docker compose ps` shows **healthy** |
 | Disk full | `docker system prune` (removes unused images and containers), or move the disk image (§1) |
