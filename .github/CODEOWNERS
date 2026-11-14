@@ -1,0 +1,22 @@
+# CODEOWNERS: requests reviews automatically when a PR touches these paths.
+# Later matching lines take precedence. Add each team member's GitHub
+# username next to the areas they own (see docs/RESOURCE_PLAN.md §5).
+
+# Default owner for everything
+*                       @KANISHQ09
+
+# Engine and data (Tech lead / Engine, Science and QA)
+/packages/engine/       @KANISHQ09
+/packages/catalog/      @KANISHQ09
+/tools/                 @KANISHQ09
+
+# Frontend (Frontend lead, Design and content)
+/apps/web/              @KANISHQ09
+
+# Backend and realtime (Backend / Realtime)
+/apps/server/           @KANISHQ09
+/packages/shared/       @KANISHQ09
+
+# Repository rules and CI
+/.github/               @KANISHQ09
+/CLAUDE.md              @KANISHQ09

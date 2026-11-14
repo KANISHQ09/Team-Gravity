@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest an idea or improvement for GRAVITY
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Who is it for (student, teacher, team player, judge), and what is hard for them today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested priority
+      description: Must = needed for the MVP, Should = MVP if time allows, Could = after the hackathon
+      options:
+        - Must
+        - Should
+        - Could
+  - type: input
+    id: requirement
+    attributes:
+      label: Related requirement ID (if any)
+      placeholder: "FR-06"

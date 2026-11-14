@@ -143,9 +143,12 @@ Client sends `POST /api/v1/scores {design, scenarioId, seed, difficulty}` → se
 
 ## 6. REST API (MVP, `/api/v1`)
 
+Full request/response contract: [API_DOCUMENTATION.md](API_DOCUMENTATION.md).
+
 | Endpoint | Purpose |
 | --- | --- |
 | `POST /auth/guest` | Issue a guest login token |
+| `POST /auth/refresh` | New access token from the refresh cookie |
 | `GET /catalogs/:version` | Parts, vehicles, orbits, scenarios (cacheable) |
 | `POST /simulate` | Server-side engine run |
 | `POST /scores` | Submit a run; the server recomputes the score |
@@ -159,7 +162,7 @@ Post-MVP: `POST /auth/oauth`, `/designs` CRUD, `GET /nasa/*`. Errors use RFC 945
 
 | Client → server | Server → client |
 | --- | --- |
-| `room:create`, `room:join`, `role:claim`, `design:patch`, `proposal:create`, `proposal:respond`, `vote:cast`, `sim:start` | `room:state`, `design:applied`, `design:rejected`, `proposal:update`, `vote:update`, `sim:result` |
+| `room:join`, `role:claim`, `design:patch`, `proposal:create`, `proposal:respond`, `vote:cast`, `sim:start` | `room:state`, `design:applied`, `design:rejected`, `proposal:update`, `vote:update`, `sim:result` |
 
 Every message is validated with Zod and unknown fields are rejected. Limits: 20 events per second per connection, 5 rooms per hour per client.
 

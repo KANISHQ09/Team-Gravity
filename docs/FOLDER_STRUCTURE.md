@@ -1,6 +1,6 @@
-# GRAVITY — Folder Structure (PROPOSAL)
+# GRAVITY — Folder Structure
 
-> Status: **⏳ Awaiting team approval (Phase 3 gate).** No folders are created until this is approved. Based on the approved [TECH_STACK](TECH_STACK.md) and [ARCHITECTURE](ARCHITECTURE.md).
+> Status: **✅ Approved by the team (2026-11-14); skeleton created.** Based on the approved [TECH_STACK](TECH_STACK.md) and [ARCHITECTURE](ARCHITECTURE.md). Changes to this structure need team approval.
 
 ## 1. Why `apps/` + `packages/` instead of `frontend/` + `backend/`
 
@@ -157,8 +157,17 @@ flowchart LR
 | `apps/admin` | Admin tooling is post-MVP |
 | Deployment workflows in `.github/workflows/` | CI validates only; deploys need explicit approval |
 
-## 5. How the skeleton will be created (after approval)
+## 5. Skeleton status
 
-1. Create the folders above, each with a short `README.md` explaining its purpose (empty folders are not tracked by Git, and a README is more useful than a `.gitkeep`).
-2. **No** `package.json`, configs or dependencies yet; those come in Phase 5.
-3. Report the created tree and the manual Git commands.
+**Created (Phase 3):** 54 folders under `apps/`, `packages/` and `tools/`, each with a short `README.md` stating its purpose and rules (Git doesn't track empty folders, and a README is more useful than a `.gitkeep`).
+
+**Created later, with real content:**
+
+| Path | Phase | Why not now |
+| --- | --- | --- |
+| `apps/web/public/` | 5 | A README there would be copied into the built site |
+| `package.json`, `tsconfig*.json`, `vite.config.ts`, `Dockerfile`, `main.ts`, `index.html` | 5 | Config and dependencies belong to the dev-environment phase |
+| `.env.example`, `docker-compose.yml`, `pnpm-workspace.yaml`, `turbo.json`, ESLint/Prettier configs | 5 | Same |
+| `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, `.github/ISSUE_TEMPLATE/`, `.github/CODEOWNERS`, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md` | 4 | Documentation phase (placeholder Markdown in `ISSUE_TEMPLATE/` would appear as a template) |
+| `CLAUDE.md`, `.claude/settings.json` | 6 | Claude Code configuration phase |
+| `.github/workflows/ci.yml` | 7 | CI is set up during validation |

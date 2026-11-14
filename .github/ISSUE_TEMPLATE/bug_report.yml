@@ -1,0 +1,57 @@
+name: Bug report
+description: Something in GRAVITY doesn't work as expected
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Security problems must not be reported here**: see SECURITY.md.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Choose scenario "Lunar Orbiter" on Engineer
+        2. Add the high-gain antenna
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: design-code
+    attributes:
+      label: Design code or seed (if any)
+      description: Paste the design code from the share button, so we can load your exact design.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Mission setup / scenarios
+        - Requirements / traceability
+        - Design Studio / gauges
+        - Readiness / risk
+        - Simulation / replay
+        - Report / scoring
+        - Co-op rooms
+        - Tutorial / glossary / accessibility
+        - Server / API
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser and device
+      placeholder: "Chrome 131 on Windows 11 / Safari on iPad"
+  - type: textarea
+    id: extra
+    attributes:
+      label: Screenshots, logs or anything else

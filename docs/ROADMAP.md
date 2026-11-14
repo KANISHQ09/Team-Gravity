@@ -10,8 +10,8 @@
 | --- | --- | --- | --- |
 | **1 Planning** ✅ drafted | Understand the project | `docs/PROJECT_OVERVIEW.md`, `REQUIREMENTS.md`, `FEATURES.md`, `TECH_STACK.md` (approved), `ARCHITECTURE.md`, `ROADMAP.md`, `RESOURCE_PLAN.md` | Tech stack ✅ approved (full Gravity.md stack); ⛔ requirements review pending |
 | **2 Repository** | Repo basics | `.gitignore`, `.editorconfig`, `.gitattributes`; branch strategy decided ✅ License MIT, `main` + `feature/*`, public; `.gitignore`, `.gitattributes`, `.editorconfig` added |
-| **3 Folder structure** | Skeleton Proposal in [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md): `apps/web`, `apps/server`, `packages/{shared,catalog,engine}`, `tools/`, `docs/`, `.github/`, each explained | ⛔ Approve the structure |
-| **4 Documentation** | Community files | `README.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, issue templates, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md` | Review |
+| **3 Folder structure** | Skeleton [FOLDER_STRUCTURE.md](FOLDER_STRUCTURE.md): `apps/web`, `apps/server`, `packages/{shared,catalog,engine}`, `tools/`, each with a README | ✅ Approved (2026-11-14); skeleton created |
+| **4 Documentation** | Community files | `README.md`, `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/PULL_REQUEST_TEMPLATE.md`, issue templates, `docs/DATA_LEDGER.md`, `docs/API_DOCUMENTATION.md`, `.github/CODEOWNERS` | ✅ Drafted (2026-11-14); review |
 | **5 Dev environment** | Tooling | pnpm + Turborepo workspace, TypeScript configs, ESLint, Prettier, Vitest, Playwright, Docker Compose (Postgres 16 + Redis), Drizzle migration `0001_init`, `.env.example` | Review dependency list; team creates Neon/Upstash accounts |
 | **6 Claude Code config** | Rules for Claude | Root `CLAUDE.md`: development rules, coding standards, **strict Git restrictions** | Review |
 | **7 Validation** | Everything works | `pnpm install`, lint, type-check, test, build all pass; GitHub Actions CI that only validates (no deploy); secret scan; repo review report | ⛔ Approve the start of feature work |
@@ -72,14 +72,14 @@ Times are relative to the team's kickoff (T+0). Detail: Gravity.md §4.3.
 - [ ] Project requirements finalized (drafted, awaiting review)
 - [x] Technology stack approved (full Gravity.md stack, 2026-11-14)
 - [x] Architecture documented (draft)
-- [ ] Folder structure approved
+- [x] Folder structure approved
 - [x] GitHub repository created (`KANISHQ09/Team-Gravity` exists as a remote; no commits yet)
 - [x] Branching strategy decided (`main` + `feature/*`)
 - [x] LICENSE selected (MIT)
-- [ ] README.md created
-- [ ] CONTRIBUTING.md created
-- [ ] SECURITY.md created
-- [ ] CODE_OF_CONDUCT.md created
+- [x] README.md created
+- [x] CONTRIBUTING.md created
+- [x] SECURITY.md created
+- [x] CODE_OF_CONDUCT.md created
 - [ ] CLAUDE.md configured
 - [ ] Strict Git restrictions added
 - [ ] Environment variables configured
