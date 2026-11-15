@@ -1,6 +1,6 @@
 # GRAVITY — Space Mission Design Game
 
-> **Status: ✅ playable MVP with online co-op (Phases 8–9).** All three missions can be designed, launched and scored in the browser: solo, hot-seat, or online with up to four players. The server provides guest login, server-side scoring, Postgres leaderboards and co-op rooms. Full description of the game: [docs/SOLUTION.md](docs/SOLUTION.md).
+> **Status: ✅ playable MVP (Phases 8–9), live at https://team-gravity.vercel.app/.** All three missions can be designed, launched and scored in the browser as solo missions. **Team play (hot-seat and online multiplayer) is coming soon** to the public site: the server (guest login, server-side scoring, Postgres leaderboards and co-op rooms) is built and tested, and works locally. Full description of the game: [docs/SOLUTION.md](docs/SOLUTION.md).
 
 GRAVITY is a browser game for the **NASA Space Apps Challenge 2026 — Space Mission Design Game**. Solo or in a team of up to four, players design a complete space mission: pick a science objective, turn it into measurable requirements, design the spacecraft and choose instruments, pick a launch vehicle and orbit, balance **mass, power, budget, data, communications and time**, pass a launch-readiness review, fly the mission, and read a report that explains **why** it succeeded or failed.
 
@@ -24,7 +24,7 @@ No public deployment yet. Run it locally with `pnpm dev` (see below) and open <h
 | Readiness | Green/yellow/red launch review (≥ 80% green and every critical item green) and a 5×5 risk matrix |
 | Simulation | Deterministic six-phase simulation with random events (solar storms, wheel failures, launch slips, budget cuts, antenna anomalies, battery wear) that your design choices soften |
 | Report | 0–100 score in five parts, cause-and-effect explanations, one-click "Try changing…" suggestions, similar real NASA missions, 2D mission replay |
-| Team play | **Online rooms** for 2–4 players (share a 6-letter code; live design sync, roles, proposals, GO/NO-GO, shared launch) and **hot-seat** co-op on one device |
+| Team play | **Coming soon** to the public site. Built and tested: online rooms for 2–4 players (6-letter code, roles, live design sync, proposals, GO/NO-GO, shared launch) with the local server, and a hot-seat mode in the code. Missions are solo for now |
 | Compare designs | Trade-space chart of all your runs (cost vs science, risk by marker shape) and a "What matters most?" sensitivity view |
 | Sharing | Autosave in the browser; shareable design codes; optional online leaderboard (server recomputes every score) |
 | Learning | Explorer hints, glossary, "why does this matter?" on every part; every number labelled `NASA` / `DERIVED` / `GAME` |
@@ -92,12 +92,12 @@ All variables are documented in [`.env.example`](.env.example); copy it to `.env
 
 ## Deploying the web app (Vercel, static)
 
-Solo play, hot-seat team play, the 3D hangar and the 3D flight run entirely in the browser, so the web app can be hosted as static files. `apps/web/vercel.json` holds the build settings.
+Solo play, the 3D hangar and the 3D flight run entirely in the browser, so the web app can be hosted as static files. `apps/web/vercel.json` holds the build settings.
 
 1. On [vercel.com](https://vercel.com), **Add New → Project** and import this GitHub repository.
 2. Set **Root Directory** to `apps/web`. Vercel reads the install and build commands from `apps/web/vercel.json` (pnpm 12.17.0, `--frozen-lockfile`).
 3. Under **Settings → Build and Deployment**, set the Node.js version to **22.x**.
-4. Leave `VITE_API_URL` unset. Online rooms and the leaderboard then switch off with a friendly message; everything else works.
+4. Leave `VITE_API_URL` unset. Online multiplayer then shows as "Coming soon" and the leaderboard is hidden; everything else works.
 5. **Deploy.** Each push to `main` updates the live site, and each pull request gets its own preview link.
 
 Online rooms need the game server (`apps/server`, plus Redis and Postgres) hosted separately; set `VITE_API_URL` to its address to switch them on.

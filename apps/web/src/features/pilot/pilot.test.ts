@@ -6,6 +6,7 @@ import {
   insertionStep,
 } from './insertionGame.ts';
 import { launchAutopilot, launchResult, launchStart, launchStep } from './launchGame.ts';
+import { type ActiveGame, advanceGame, newFlightSim } from './flightSim.ts';
 import { pilotSummary } from './pilotScore.ts';
 import { scienceAutopilot, scienceResult, scienceStart, scienceStep } from './scienceGame.ts';
 
@@ -85,5 +86,30 @@ describe('pilot mini-games', () => {
     expect(s?.score).toBe(85);
     expect(s?.medal).toBe('gold');
     expect(pilotSummary([])).toBeNull();
+  });
+
+  it('the autopilot follows the speed setting; a player always flies in real time', () => {
+    const frames = (auto: boolean, pace: number) => {
+      const g: ActiveGame = {
+        id: 'launch',
+        label: 'Launch',
+        started: true,
+        auto,
+        finished: false,
+        type: 'launch',
+        s: launchStart(),
+      };
+      const keys = newFlightSim().keys;
+      let n = 0;
+      while (!g.s.done && n < 100_000) {
+        advanceGame(g, keys, DT, pace);
+        n++;
+      }
+      return n;
+    };
+    expect(frames(true, 5)).toBeLessThan(frames(true, 1) / 4);
+    expect(frames(true, 2)).toBeLessThan(frames(true, 1) / 1.9);
+    // Speed never changes a hand-flown game.
+    expect(frames(false, 5)).toBe(frames(false, 1));
   });
 });

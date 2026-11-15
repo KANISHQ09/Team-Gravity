@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/immutability -- Three.js objects and the 60 fps game state are mutated outside React on purpose (render loop), not during render. */
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { cx, fmt } from '../../lib/format.ts';
 import { HOLD_NEEDED, ZONE } from './anomalyGame.ts';
@@ -138,7 +137,16 @@ const BRIEF: Record<ActiveGame['type'], { controls: string[] }> = {
   anomaly: { controls: [] },
 };
 
-export function PilotHud({ sim, onStart }: { sim: FlightSim; onStart: (auto: boolean) => void }) {
+export function PilotHud({
+  sim,
+  onStart,
+  onAutopilot,
+}: {
+  sim: FlightSim;
+  onStart: (auto: boolean) => void;
+  /** Hand the running game over to the autopilot. */
+  onAutopilot: () => void;
+}) {
   useTick(90);
   const startRef = useRef<HTMLButtonElement>(null);
   const g = sim.game;
@@ -218,9 +226,7 @@ export function PilotHud({ sim, onStart }: { sim: FlightSim; onStart: (auto: boo
           {!g.auto && (
             <button
               type="button"
-              onClick={() => {
-                g.auto = true;
-              }}
+              onClick={onAutopilot}
               className="rounded border border-slate-600 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-slate-300 hover:bg-slate-800"
             >
               Autopilot

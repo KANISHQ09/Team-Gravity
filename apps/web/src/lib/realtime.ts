@@ -228,6 +228,7 @@ registerRemote({
   respond: (proposalId, accept) => socket?.emit('proposal:respond', { proposalId, accept }),
   launch: () => socket?.emit('sim:start'),
   leaveKeepingDesign: () => leaveKeepingDesign(true),
+  leave: leaveRoom,
 });
 
 export const claimRoles = (roles: Role[]) => socket?.emit('role:claim', { roles });

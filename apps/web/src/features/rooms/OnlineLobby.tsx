@@ -17,10 +17,17 @@ export function OnlineLobby() {
 
   if (!onlineConfigured) {
     return (
-      <p className="text-sm text-slate-400">
-        Online rooms are not switched on in this version of the game. You can still play as a team:
-        pick 2–4 players on a mission card and take turns on this device, each with their own role.
-      </p>
+      <div className="space-y-3 text-sm">
+        <p className="text-base text-slate-200">
+          Online multiplayer is coming soon: up to four friends on different devices, each in a
+          mission role, with a shared room code, live design sync, proposals and a team GO/NO-GO
+          vote before launch.
+        </p>
+        <p className="text-slate-400">
+          Until then, every mission is a solo mission: you hold all four roles yourself, from
+          Mission Architect to Operations.
+        </p>
+      </div>
     );
   }
   const busy = status === 'connecting';

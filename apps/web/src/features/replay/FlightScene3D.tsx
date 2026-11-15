@@ -13,7 +13,7 @@ import { makeSpaceEnvironment, craftMaterials } from '../../components/space3d/m
 import { Planet } from '../../components/space3d/Planet.tsx';
 import { Spacecraft } from '../../components/space3d/Spacecraft.tsx';
 import { SUN_DIR, SpaceBackdrop, glowTextures } from '../../components/space3d/SpaceBackdrop.tsx';
-import { type FlightSim, gameDone, stepGame } from '../pilot/flightSim.ts';
+import { type FlightSim, advanceGame, gameDone } from '../pilot/flightSim.ts';
 import {
   type InsertionState,
   insertionStart,
@@ -74,6 +74,8 @@ export interface FlightScene3DProps {
   orbitAltKm: number;
   /** Called once when the active mini-game reports done. */
   onGameDone: () => void;
+  /** How many times faster than real time the autopilot flies (from the speed buttons). */
+  autoPace: number;
 }
 
 function Environment() {
@@ -315,7 +317,7 @@ function FlightWorld(props: FlightScene3DProps) {
     const g = sim.game;
 
     if (g && g.started && !g.finished) {
-      stepGame(g, sim.keys, dt * (g.auto ? 1.6 : 1));
+      advanceGame(g, sim.keys, dt, props.autoPace);
       if (gameDone(g)) {
         g.finished = true;
         props.onGameDone();

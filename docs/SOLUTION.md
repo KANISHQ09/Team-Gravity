@@ -45,7 +45,7 @@ The stages follow NASA's own mission process (from the *Design and Develop Scien
 
 ### 5.1 Start
 
-The home screen offers three missions and three difficulty levels. Players can play **solo**, **hot-seat** (2–4 players on one device), or **online** in a room with friends.
+The home screen offers three missions and three difficulty levels. Every mission is played **solo** for now, with the player holding all four roles; **team play with friends is coming soon** (see §8).
 
 ### 5.2 The six stages
 
@@ -131,7 +131,9 @@ Each mission has 3–4 weighted science goals (for example, mapping crops, findi
 
 **Honest numbers.** Every value in the game carries a label: `NASA` (taken from a NASA source), `NASA/GMAT` (calculated with NASA's GMAT tool), `DERIVED` (calculated from NASA values) or `GAME` (simplified for play). All sources are listed with their licence terms in [DATA_LEDGER.md](DATA_LEDGER.md).
 
-## 8. Playing together
+## 8. Playing together (coming soon)
+
+> **Status:** missions are solo on the public site today, with the player holding all four roles. Team play is built and tested (online rooms with the local game server) and will be switched on once the server is hosted.
 
 GRAVITY works like a real mission team. There are four roles, based on NASA Goddard's Mission Design Lab:
 
@@ -145,7 +147,7 @@ GRAVITY works like a real mission team. There are four roles, based on NASA Godd
 - With 1–3 players, the roles are shared out automatically.
 - A player can change only the parts their role owns. To touch another area, they send a **proposal**, which the owner accepts or rejects.
 - Before launch, **every player votes GO or NO-GO**. A NO-GO needs one of four fixed reasons, such as "Margins are too thin".
-- **Online rooms:** the host creates a room and shares a 6-character code. Up to four friends join, claim roles, and see every change live. The server checks every change with the same engine and recomputes every score, so nobody can cheat.
+- **Online rooms (coming soon on the public site; working with the local server):** the host creates a room and shares a 6-character code. Up to four friends join, claim roles, and see every change live. The server checks every change with the same engine and recomputes every score, so nobody can cheat.
 - **Safe for young players:** guest play needs no name, e-mail or account, and there is no free-text chat.
 
 ## 9. Built for every learner
@@ -157,7 +159,7 @@ GRAVITY works like a real mission team. There are four roles, based on NASA Godd
   - respects "reduce motion";
   - target is WCAG 2.2 AA, and automated axe-core checks run on every screen.
 - **Plain language:** the game explains the *why*, and a glossary covers terms like Δv, link margin and TRL.
-- **Works offline:** after the first visit it is an installable app (PWA), so solo and hot-seat play need no internet.
+- **Works offline:** after the first visit it is an installable app (PWA), so solo play needs no internet.
 - **Light on devices:** it runs in the browser on school laptops, tablets and phones, and the simulation runs in a background thread so the screen stays smooth.
 - **Replayable:** three difficulties, random events and the trade-space chart reward trying again.
 
@@ -235,7 +237,7 @@ We use concepts and facts in our own words. We do not copy NASA images or logos,
 4. **(1:30)** Build & Verify: the readiness checklist and risk matrix, then "What matters most?" ranks the next change.
 5. **(1:50)** GO vote, launch, and the mission flies through its six phases, with an event that a margin softens.
 6. **(2:20)** Report: score breakdown, "because you chose…" statements, the closest real NASA mission, and the trade-space chart after a second run.
-7. **(2:45)** Online: a room code joined from a second device shows a live change and a proposal being accepted.
+7. **(2:45)** Coming soon: show the "Play online with friends" section and explain team play (four roles, proposals, GO/NO-GO vote). If the local server is running, demo a room code joined from a second device.
 
 ## 15. What's next
 

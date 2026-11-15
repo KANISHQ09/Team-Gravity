@@ -106,12 +106,13 @@ export function requirementsFromAnalysis(a: DesignAnalysis): Requirement[] {
   });
   reqs.push({
     id: 'REQ-PWR-1',
-    text: `Generate at least ${pct(margin)} more power than the spacecraft uses.`,
+    // Same definition as the power gauge: at least `margin` of the generated power left spare.
+    text: `Keep at least ${pct(margin)} of the generated power spare.`,
     segment: 'space',
     verification: 'analysis',
-    target: `≥ ${fmt(a.powerConsumptionW * (1 + margin))} W`,
+    target: `≥ ${fmt(a.powerConsumptionW / (1 - margin))} W`,
     actual: `${fmt(a.powerGenerationW)} W`,
-    status: status(orbit !== null, a.powerGenerationW >= a.powerConsumptionW * (1 + margin)),
+    status: status(orbit !== null, a.powerGenerationW * (1 - margin) >= a.powerConsumptionW),
   });
   reqs.push({
     id: 'REQ-PWR-2',
