@@ -25,6 +25,19 @@ describe('App shell', () => {
     expect(screen.queryByRole('button', { name: 'Create room' })).not.toBeInTheDocument();
   });
 
+  it('opens the phone menu, navigates, and closes it', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    const menu = screen.getByRole('navigation', { name: 'Main menu' });
+    fireEvent.click(within(menu).getByRole('button', { name: /Glossary/ }));
+    expect(screen.getByRole('heading', { name: 'Glossary' })).toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: 'Main menu' })).not.toBeInTheDocument();
+    // Escape closes it too.
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByRole('navigation', { name: 'Main menu' })).not.toBeInTheDocument();
+  });
+
   it('offers the three MVP scenarios and starts a mission at stage 1', () => {
     render(<App />);
     expect(
@@ -53,6 +66,21 @@ describe('App shell', () => {
     expect(useGame.getState().design).toBeNull();
     expect(screen.getByRole('heading', { level: 1, name: 'GRAVITY' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Current mission' })).not.toBeInTheDocument();
+  });
+
+  it('analyses a design, auto-fixes it and goes to launch', async () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start Lunar Orbiter' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Analyse my design' }));
+    const panel = screen.getByRole('region', { name: 'Design analysis' });
+    expect(within(panel).getByText('Launch blocked')).toBeInTheDocument();
+    expect(within(panel).getByRole('button', { name: /Go to launch/ })).toBeDisabled();
+    fireEvent.click(within(panel).getByRole('button', { name: 'Auto-fix my design' }));
+    expect(await within(panel).findByText(/Auto-fix made \d+ changes/)).toBeInTheDocument();
+    expect(within(panel).getByText('Ready to launch')).toBeInTheDocument();
+    fireEvent.click(within(panel).getByRole('button', { name: /Go to launch/ }));
+    expect(screen.getByRole('heading', { name: 'Stage 6: Implement' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Launch mission' })).toBeInTheDocument();
   });
 
   it('updates the traceability matrix when a goal is selected (FR-02)', () => {
@@ -142,7 +170,7 @@ describe('trade space and sensitivity (FR-19)', () => {
     act(() => useGame.getState().loadDesign(lunar));
     act(() => useGame.getState().setStage('verify'));
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: 'Analyse my design' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Run what-if analysis' }));
     fireEvent.click(screen.getByRole('button', { name: 'Apply: Use 2 ground stations' }));
     expect(useGame.getState().design?.groundStations).toBe(2);
   });

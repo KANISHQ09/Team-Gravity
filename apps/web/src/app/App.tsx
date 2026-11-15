@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode, useEffect } from 'react';
+import { Component, type ErrorInfo, type ReactNode, useEffect, useState } from 'react';
 import { About } from '../features/education/About.tsx';
 import { Glossary } from '../features/education/Glossary.tsx';
 import { ReportScreen } from '../features/report/ReportScreen.tsx';
@@ -19,6 +19,21 @@ export function App() {
   const go = useGame((s) => s.go);
   const hasMission = useGame((s) => s.design !== null);
   const hasResult = useGame((s) => s.result !== null);
+  // The phone menu belongs to the screen it was opened on, so any screen change closes it.
+  const [menuFor, setMenuFor] = useState<Screen | null>(null);
+  const menuOpen = menuFor === screen;
+  const setMenuOpen = (open: boolean | ((o: boolean) => boolean)) =>
+    setMenuFor((typeof open === 'function' ? open(menuOpen) : open) ? screen : null);
+
+  // Close the phone menu on Escape (picking an item closes it too).
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuFor(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
 
   // A distinct page title per screen helps screen-reader and tab users know where they are.
   useEffect(() => {
@@ -75,7 +90,7 @@ export function App() {
             <img src="/icon.svg" alt="" className="h-8 w-8" />
             GRAVITY
           </button>
-          <nav aria-label="Main">
+          <nav aria-label="Main" className="hidden md:block">
             <ul className="flex flex-wrap gap-1">
               {hasMission && (
                 <li>
@@ -93,7 +108,69 @@ export function App() {
               ))}
             </ul>
           </nav>
+          {/* Phones and small tablets: a hamburger menu. */}
+          <button
+            type="button"
+            className="grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-black/60 text-white md:hidden"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <span aria-hidden="true" className="relative block h-3.5 w-5">
+              <span
+                className={cx(
+                  'absolute left-0 h-0.5 w-5 rounded bg-current transition',
+                  menuOpen ? 'top-1.5 rotate-45' : 'top-0',
+                )}
+              />
+              <span
+                className={cx(
+                  'absolute left-0 top-1.5 h-0.5 w-5 rounded bg-current transition',
+                  menuOpen && 'opacity-0',
+                )}
+              />
+              <span
+                className={cx(
+                  'absolute left-0 h-0.5 w-5 rounded bg-current transition',
+                  menuOpen ? 'top-1.5 -rotate-45' : 'top-3',
+                )}
+              />
+            </span>
+          </button>
         </div>
+        {menuOpen && (
+          <nav
+            id="mobile-menu"
+            aria-label="Main menu"
+            className="border-t border-white/10 bg-black/95 px-4 pb-5 pt-2 backdrop-blur md:hidden"
+          >
+            <ul className="space-y-1">
+              {[
+                ...(hasMission ? [{ screen: 'mission' as Screen, label: 'Current mission' }] : []),
+                ...NAV,
+              ].map((n) => (
+                <li key={n.screen}>
+                  <button
+                    type="button"
+                    aria-current={screen === n.screen ? 'page' : undefined}
+                    onClick={() => {
+                      go(n.screen);
+                      setMenuOpen(false);
+                    }}
+                    className={cx(
+                      'flex w-full items-center justify-between rounded-xl px-4 py-3.5 text-left text-base font-bold uppercase tracking-[0.2em]',
+                      screen === n.screen ? 'bg-white text-black' : 'text-white hover:bg-white/10',
+                    )}
+                  >
+                    {n.label}
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
       </header>
       <main id="content" className={isHome ? '' : 'mx-auto max-w-7xl px-4 py-8'}>
         <ErrorBoundary>{view}</ErrorBoundary>

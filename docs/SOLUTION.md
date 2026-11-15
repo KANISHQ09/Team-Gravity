@@ -58,6 +58,8 @@ The home screen offers three missions and three difficulty levels. Every mission
 | 5 | **Build & Verify** | Check readiness items, see the 5×5 risk matrix, and fix red items. A "What matters most?" analysis ranks single changes by their effect on science | A mission only launches when it is ready; margins protect you from surprises |
 | 6 | **Implement** | Every player votes GO or NO-GO (with a reason), then the team launches | Launch is a team decision |
 
+**Stuck?** On any stage, **Analyse my design** lists every problem with its fix. **Auto-fix my design** repairs the design step by step, explaining each change ("Add the S-band patch antenna, which fixes: missing an antenna"), and **Go to launch** jumps straight to the GO vote.
+
 ### 5.3 The six resources (live gauges)
 
 | Gauge | What fills it |

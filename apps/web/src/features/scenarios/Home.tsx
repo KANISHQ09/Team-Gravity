@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { catalog } from '@gravity/engine';
-import type { Body, Difficulty } from '@gravity/shared';
+import type { Difficulty } from '@gravity/shared';
 import { Button } from '../../components/ui.tsx';
 import { useReducedMotion } from '../../hooks/useReducedMotion.ts';
 import { onlineConfigured } from '../../lib/api.ts';
+import { PLANET_PHOTO } from '../../lib/planets.ts';
 import { DIFFICULTY_LABEL, bodyName, fmt } from '../../lib/format.ts';
 import { decodeDesign, STAGES, useGame } from '../../store/game.ts';
 import { OnlineLobby } from '../rooms/OnlineLobby.tsx';
@@ -22,14 +23,6 @@ const STAGE_HELP: Record<string, string> = {
   design: 'Build the spacecraft while six live gauges react.',
   verify: 'Pass the readiness review and check the risks.',
   launch: 'Vote GO or NO-GO, launch, and watch it fly.',
-};
-
-/** CSS-only planet art, so the landing page needs no image assets for the cards. */
-const PLANET_STYLE: Record<Body, string> = {
-  earth:
-    'radial-gradient(circle at 32% 30%, #bfe3ff 0%, #3b82c4 18%, #1d4f8c 45%, #0b2346 70%, #020814 100%)',
-  moon: 'radial-gradient(circle at 32% 30%, #f1f1ef 0%, #b9b7b2 25%, #7d7a74 55%, #3a3835 80%, #0b0b0a 100%)',
-  mars: 'radial-gradient(circle at 32% 30%, #ffd3a8 0%, #e07b3c 22%, #a7431b 50%, #4d1a08 78%, #120402 100%)',
 };
 
 export function Home() {
@@ -293,9 +286,14 @@ function ScenarioCard({
         aria-hidden="true"
         className="relative h-44 overflow-hidden bg-[radial-gradient(ellipse_at_top,#1e293b_0%,#000_70%)]"
       >
-        <div
-          className="absolute left-1/2 top-8 h-56 w-56 -translate-x-1/2 rounded-full shadow-[0_0_60px_rgba(147,197,253,0.25)] transition-transform duration-700 group-hover:scale-105"
-          style={{ background: PLANET_STYLE[s.body] }}
+        <img
+          src={PLANET_PHOTO[s.body].src}
+          alt=""
+          loading="lazy"
+          width={224}
+          height={224}
+          className="absolute left-1/2 top-8 h-56 w-56 -translate-x-1/2 rounded-full transition-transform duration-700 group-hover:rotate-6 group-hover:scale-105"
+          style={{ boxShadow: `0 0 60px ${PLANET_PHOTO[s.body].glow}` }}
         />
       </div>
       <div className="flex flex-1 flex-col gap-3 p-5">

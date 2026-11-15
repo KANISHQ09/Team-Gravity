@@ -445,3 +445,46 @@ describe('difficulty levels', () => {
     expect(item.fix).toMatch(/Radiation-tolerant CubeSat computer/);
   });
 });
+
+describe('auto-fix (Analyse my design)', () => {
+  const levels = ['explorer', 'engineer', 'flight-director'] as const;
+  const scenarios = ['cubesat-earth-observer', 'lunar-orbiter', 'mars-orbiter'] as const;
+
+  it('turns an empty design into a launchable one for every mission and difficulty', async () => {
+    const { autoFix } = await import('../src/index.ts');
+    for (const scenarioId of scenarios) {
+      for (const difficulty of levels) {
+        const fixed = autoFix(emptyDesign(scenarioId, difficulty), catalog);
+        expect(fixed.launchable, `${scenarioId} ${difficulty}: ${fixed.remaining.join('; ')}`).toBe(
+          true,
+        );
+        expect(reviewDesign(fixed.design).canLaunch).toBe(true);
+        // Every step is explained and made of real edits.
+        for (const s of fixed.steps) {
+          expect(s.title.length).toBeGreaterThan(0);
+          expect(s.edits.length).toBeGreaterThan(0);
+        }
+      }
+    }
+  }, 60_000);
+
+  it('repairs the reference designs at every difficulty and leaves launchable ones alone', async () => {
+    const { autoFix } = await import('../src/index.ts');
+    for (const d of allDesigns) {
+      for (const difficulty of levels) {
+        const start = { ...d, difficulty };
+        const fixed = autoFix(start, catalog);
+        expect(fixed.launchable, `${d.scenarioId} ${difficulty}`).toBe(true);
+        if (reviewDesign(start).canLaunch) expect(fixed.steps).toHaveLength(0);
+      }
+    }
+  }, 60_000);
+
+  it('is deterministic and never uses locked advanced parts on Explorer', async () => {
+    const { autoFix } = await import('../src/index.ts');
+    const a = autoFix(emptyDesign('lunar-orbiter', 'explorer'), catalog);
+    expect(autoFix(emptyDesign('lunar-orbiter', 'explorer'), catalog)).toEqual(a);
+    const advanced = new Set(catalog.parts.filter((p) => p.advanced).map((p) => p.id));
+    expect(a.design.partIds.some((id) => advanced.has(id))).toBe(false);
+  });
+});

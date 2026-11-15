@@ -21,6 +21,7 @@ export * from './budgets/index.ts';
 export * from './models/analysis.ts';
 export * from './models/constants.ts';
 export * from './readiness/index.ts';
+export * from './readiness/autofix.ts';
 export * from './readiness/risk.ts';
 export * from './requirements/index.ts';
 export * from './score/index.ts';

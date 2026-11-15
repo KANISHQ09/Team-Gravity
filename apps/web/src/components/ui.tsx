@@ -14,11 +14,11 @@ export function Button({
       type="button"
       {...props}
       className={cx(
-        'rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 disabled:cursor-not-allowed disabled:opacity-50',
-        variant === 'primary' && 'bg-sky-500 text-slate-950 hover:bg-sky-400',
+        'rounded-lg px-3.5 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300 disabled:cursor-not-allowed disabled:opacity-50',
+        variant === 'primary' && 'bg-orange-500 text-black hover:bg-orange-400',
         variant === 'secondary' &&
-          'border border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700',
-        variant === 'ghost' && 'text-sky-300 hover:bg-slate-800',
+          'border border-white/15 bg-white/5 text-slate-100 hover:border-white/30 hover:bg-white/10',
+        variant === 'ghost' && 'text-sky-300 hover:bg-white/5',
         variant === 'danger' &&
           'border border-rose-500 bg-rose-950 text-rose-100 hover:bg-rose-900',
         className,
@@ -29,7 +29,12 @@ export function Button({
 
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cx('rounded-lg border border-slate-700 bg-slate-900/80 p-4', className)}>
+    <div
+      className={cx(
+        'rounded-xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-4 shadow-[0_8px_30px_rgba(0,0,0,0.35)]',
+        className,
+      )}
+    >
       {children}
     </div>
   );
@@ -97,9 +102,18 @@ export function GaugeBar({ gauge }: { gauge: Gauge }) {
         aria-valuemax={100}
         aria-valuenow={Math.round(fill)}
         aria-valuetext={`${value}, ${gauge.margin === null ? 'limit not known' : `${pct(gauge.margin)} margin`}`}
-        className="h-2 overflow-hidden rounded bg-slate-800"
+        className="relative h-2.5 overflow-hidden rounded-full bg-slate-800"
       >
-        <div className={cx('h-full', color)} style={{ width: `${fill}%` }} />
+        <div
+          className={cx('h-full rounded-full transition-[width] duration-500', color)}
+          style={{ width: `${fill}%` }}
+        />
+        {/* The line shows where the required spare margin starts. */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 w-0.5 bg-white/70"
+          style={{ left: `${(1 - gauge.target) * 100}%` }}
+        />
       </div>
       <p className="text-xs text-slate-400">
         {value}

@@ -228,6 +228,7 @@ function FlightWorld(props: FlightScene3DProps) {
   const stationSprites = useRef<(THREE.Sprite | null)[]>([]);
   const shield = useRef<THREE.Mesh>(null);
   const alarm = useRef<THREE.PointLight>(null);
+  const fill = useRef<THREE.PointLight>(null);
   const storm = useRef<THREE.Points>(null);
   const [anim, setAnim] = useState({
     deploy: 0,
@@ -607,11 +608,12 @@ function FlightWorld(props: FlightScene3DProps) {
           );
         }
         const cam = new THREE.Vector3().copy(SUN_DIR).cross(rHat).normalize();
+        // Close enough that the spacecraft fills the view during the emergency.
         camGoal
           .copy(craftPos)
-          .addScaledVector(cam, 0.32)
-          .addScaledVector(rHat, 0.12)
-          .addScaledVector(tHat, -0.12);
+          .addScaledVector(cam, CRAFT_SIZE * 2.4)
+          .addScaledVector(rHat, CRAFT_SIZE * 0.9)
+          .addScaledVector(tHat, -CRAFT_SIZE * 0.9);
         lookGoal.copy(craftPos);
       } else {
         // Cinematic: cycle chase, close orbit and wide shots every ~9 s.
@@ -705,6 +707,11 @@ function FlightWorld(props: FlightScene3DProps) {
     camera.up.lerp(upGoal, S.snap ? 1 : 1 - Math.exp(-dt * 2.6)).normalize();
     camera.position.copy(S.camPos);
     camera.lookAt(S.camLook);
+    // A soft light from the camera, so the craft stays visible on a planet's night side.
+    if (fill.current) {
+      fill.current.position.copy(camera.position);
+      fill.current.intensity = g?.type === 'anomaly' || g?.type === 'science' ? 0.08 : 0.03;
+    }
 
     // Re-render the spacecraft only when its animation visibly changes.
     const q = (n: number) => Math.round(n * 20) / 20;
@@ -826,10 +833,11 @@ function FlightWorld(props: FlightScene3DProps) {
         />
       </mesh>
       <pointLight ref={alarm} color="#ff2a2a" distance={1} intensity={0} />
+      <pointLight ref={fill} color="#cbd5e1" distance={2} decay={1} intensity={0} />
       <points ref={storm} geometry={stormGeo} visible={false}>
         <pointsMaterial
           map={soft}
-          size={0.03}
+          size={0.02}
           color="#fdba74"
           transparent
           blending={THREE.AdditiveBlending}

@@ -89,6 +89,8 @@ interface GameState {
   setPilot(pilot: PilotSummary | null): void;
   /** Close the current mission and return home (leaves an online room first). Run history is kept. */
   exitMission(): void;
+  /** Apply a batch of changes (the auto-fix) as one step; solo missions only. */
+  applyEdits(edits: readonly DesignEdit[]): void;
 }
 
 const PLAYER_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
@@ -268,6 +270,17 @@ export const useGame = create<GameState>()(
       dismissNotice: () => set({ notice: null }),
 
       setPilot: (pilot) => set({ pilot }),
+
+      applyEdits: (edits) => {
+        const { design, players } = get();
+        if (!design || online()) return;
+        set({
+          design: edits.reduce(applyEdit, design),
+          // Any change to the design invalidates earlier GO votes.
+          votes: players.map(() => null),
+          notice: null,
+        });
+      },
 
       exitMission: () => {
         online()?.leave();

@@ -21,7 +21,7 @@ export function SensitivityPanel({ design }: { design: Design }) {
         can see which decisions move your science the most. Nothing changes unless you press Apply.
       </p>
       <Button onClick={() => setResult({ for: design, data: sensitivity(design, catalog) })}>
-        {current ? 'Analyse again' : 'Analyse my design'}
+        {current ? 'Run again' : 'Run what-if analysis'}
       </Button>
       {current && (
         <div className="overflow-x-auto">
