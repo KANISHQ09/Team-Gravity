@@ -296,13 +296,27 @@ describe('sensitivity (SRS-TRD-02)', () => {
     const labels = first.rows.map((r) => r.label);
     expect(labels).toContain('Use 2 ground stations');
     expect(labels).toContain('Remove the High-resolution camera');
-    // Sorted by size of effect.
-    const sizes = first.rows.map((r) => Math.abs(r.scienceDelta));
+    // Launchable changes first, each group sorted by size of effect.
+    const firstBlocked = first.rows.findIndex((r) => !r.launchable);
+    const ok = firstBlocked < 0 ? first.rows : first.rows.slice(0, firstBlocked);
+    expect(first.rows.slice(ok.length).every((r) => !r.launchable)).toBe(true);
+    const sizes = ok.map((r) => Math.abs(r.scienceDelta));
     expect(sizes).toEqual([...sizes].sort((x, y) => y - x));
     // Removing an instrument lowers science and saves money.
     const remove = first.rows.find((r) => r.label === 'Remove the Imaging spectrometer')!;
     expect(remove.scienceDelta).toBeLessThan(0);
     expect(remove.costDeltaM).toBeLessThan(0);
+  });
+
+  it('explains why a what-if change would block the launch', async () => {
+    const { sensitivity } = await import('../src/index.ts');
+    // The walkthrough CubeSat: one instrument per goal, so removing any one leaves a goal uncovered.
+    const rows = sensitivity(cubesat, catalog).rows;
+    const remove = rows.find((r) => r.label === 'Remove the CubeSat camera')!;
+    expect(remove.launchable).toBe(false);
+    expect(remove.blockedBy).toMatch(/goal|instrument/i);
+    expect(rows.filter((r) => r.launchable).every((r) => r.blockedBy === null)).toBe(true);
+    expect(rows.at(-1)?.launchable).toBe(false);
   });
 });
 
