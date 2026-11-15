@@ -94,6 +94,16 @@ export function stepGame(g: ActiveGame, k: Keys, dt: number): void {
   }
 }
 
+/**
+ * One animation frame of a mini-game. A player always flies in real time; the
+ * autopilot runs `pace` small steps per frame (several small steps, not one big
+ * one, keep the orbital physics accurate at high speed).
+ */
+export function advanceGame(g: ActiveGame, k: Keys, dt: number, pace: number): void {
+  const steps = g.auto ? Math.max(1, Math.round(pace)) : 1;
+  for (let i = 0; i < steps && !g.s.done; i++) stepGame(g, k, dt);
+}
+
 export function gameDone(g: ActiveGame): boolean {
   return g.s.done;
 }

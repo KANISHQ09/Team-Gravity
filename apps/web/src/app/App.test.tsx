@@ -18,6 +18,13 @@ describe('App shell', () => {
     expect(screen.getByText(/not a NASA product/i)).toBeInTheDocument();
   });
 
+  it('shows online multiplayer as coming soon when no game server is configured', () => {
+    render(<App />);
+    expect(screen.getByText('Coming soon')).toBeInTheDocument();
+    expect(screen.getByText(/Online multiplayer is coming soon/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Create room' })).not.toBeInTheDocument();
+  });
+
   it('offers the three MVP scenarios and starts a mission at stage 1', () => {
     render(<App />);
     expect(
@@ -28,6 +35,24 @@ describe('App shell', () => {
     expect(screen.getByRole('heading', { name: 'Stage 1: Need & Goals' })).toBeInTheDocument();
     // Six live gauges are always visible.
     expect(screen.getAllByRole('meter')).toHaveLength(6);
+  });
+
+  it('exits the current mission only after confirming, keeping run history', () => {
+    useGame.setState({ history: [] });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Start Lunar Orbiter' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Exit mission' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Exit this mission?' });
+    // The safe choice has focus, and cancelling keeps the mission.
+    expect(within(dialog).getByRole('button', { name: 'Keep playing' })).toHaveFocus();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Keep playing' }));
+    expect(screen.getByRole('heading', { name: 'Stage 1: Need & Goals' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Exit mission' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Yes, exit mission' }));
+    expect(useGame.getState().design).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: 'GRAVITY' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Current mission' })).not.toBeInTheDocument();
   });
 
   it('updates the traceability matrix when a goal is selected (FR-02)', () => {

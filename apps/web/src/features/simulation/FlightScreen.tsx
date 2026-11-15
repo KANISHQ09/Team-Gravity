@@ -16,10 +16,13 @@ import { scienceStart } from '../pilot/scienceGame.ts';
 import { CAPTURE_TARGET, earthOrbitRatio } from '../replay/flightGeometry.ts';
 import { type FlightTimeline, LAUNCH_START, flightRate, shotAt } from '../replay/flightTimeline.ts';
 import { MissionReplay } from '../replay/MissionReplay.tsx';
+import { ExitMission } from '../../app/ExitMission.tsx';
 
 const FlightScene3D = lazy(() => import('../replay/FlightScene3D.tsx'));
 
 const SPEEDS = [1, 5, 20] as const;
+/** How much faster than real time the autopilot flies a mini-game at each speed. */
+const AUTO_PACE: Record<(typeof SPEEDS)[number], number> = { 1: 1, 5: 2, 20: 5 };
 
 interface Checkpoint {
   readonly day: number;
@@ -51,6 +54,10 @@ export function FlightScreen() {
   // ----- 3D flight mini-games -----
   const sim = useMemo(() => newFlightSim(), []);
   const [gameOn, setGameOn] = useState(false);
+  /** True while the autopilot flies the current mini-game (the speed buttons then apply). */
+  const [autoOn, setAutoOn] = useState(false);
+  /** True while the player flies a mini-game by hand (it must run in real time). */
+  const [flyingYourself, setFlyingYourself] = useState(false);
   const [results, setResults] = useState<PilotGameResult[]>([]);
   const [toast, setToast] = useState<PilotGameResult | null>(null);
   const done = useRef(new Set<number>());
@@ -174,6 +181,8 @@ export function FlightScreen() {
       setToast(res);
       sim.game = null;
       setGameOn(false);
+      setAutoOn(false);
+      setFlyingYourself(false);
       if (g.type === 'launch') setDay(-0.4);
       if (g.type === 'insertion') setDay(transfer > 0 ? transfer + 0.8 : 0.9);
     },
@@ -235,11 +244,14 @@ export function FlightScreen() {
         <h2 className="text-2xl font-semibold" tabIndex={-1}>
           Mission in flight: {scenario.name}
         </h2>
-        {view.available && (
-          <Button variant="ghost" aria-pressed={view.on} onClick={() => view.setOn(!view.on)}>
-            {view.on ? 'Switch to 2D view' : 'Switch to 3D view'}
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {view.available && (
+            <Button variant="ghost" aria-pressed={view.on} onClick={() => view.setOn(!view.on)}>
+              {view.on ? 'Switch to 2D view' : 'Switch to 3D view'}
+            </Button>
+          )}
+          <ExitMission />
+        </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <div className="space-y-4">
@@ -265,6 +277,7 @@ export function FlightScreen() {
                     orbitId={orbit.id}
                     orbitAltKm={orbit.altitudeKm}
                     onGameDone={onGameDone}
+                    autoPace={AUTO_PACE[speed]}
                   />
                 </Suspense>
               </div>
@@ -295,7 +308,14 @@ export function FlightScreen() {
                   if (sim.game) {
                     sim.game.auto = auto;
                     sim.game.started = true;
+                    setAutoOn(auto);
+                    setFlyingYourself(!auto);
                   }
+                }}
+                onAutopilot={() => {
+                  if (sim.game) sim.game.auto = true;
+                  setAutoOn(true);
+                  setFlyingYourself(false);
                 }}
               />
             </div>
@@ -317,6 +337,8 @@ export function FlightScreen() {
                 key={s}
                 variant={speed === s ? 'primary' : 'secondary'}
                 aria-pressed={speed === s}
+                disabled={flyingYourself}
+                aria-describedby={flyingYourself ? 'speed-note' : undefined}
                 onClick={() => setSpeed(s)}
               >
                 {s}×
@@ -325,6 +347,18 @@ export function FlightScreen() {
             <Button variant="ghost" onClick={skip} disabled={finished}>
               Skip to end
             </Button>
+            {flyingYourself && (
+              <p id="speed-note" className="w-full text-xs text-slate-400">
+                You are flying, so this part runs in real time. Speed applies to the autopilot and
+                to the mission clock between your turns.
+              </p>
+            )}
+            {autoOn && (
+              <p className="w-full text-xs text-slate-400">
+                The autopilot is flying at {AUTO_PACE[speed]}× real time; change the speed to watch
+                it faster or slower.
+              </p>
+            )}
           </div>
           <section aria-labelledby="events-heading">
             <h3 id="events-heading" className="mb-2 text-lg font-semibold">

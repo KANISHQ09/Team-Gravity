@@ -401,3 +401,47 @@ describe('"Try changing…" suggestions (SRS-SCR-05)', () => {
     expect(edits).toContainEqual({ type: 'addPart', partId: 'adcs-cube-wheels', category: 'adcs' });
   });
 });
+
+describe('difficulty levels', () => {
+  const levels = ['explorer', 'engineer', 'flight-director'] as const;
+
+  it('power requirement and power gauge agree at every difficulty', () => {
+    for (const d of allDesigns) {
+      for (const difficulty of levels) {
+        const r = reviewDesign({ ...d, difficulty });
+        const req = r.requirements.find((q) => q.id === 'REQ-PWR-1')!;
+        const gauge = r.gauges.find((g) => g.key === 'power')!;
+        if (gauge.margin === null) continue;
+        expect(req.status === 'pass', `${d.scenarioId} ${difficulty}`).toBe(
+          gauge.margin >= gauge.target - 1e-9,
+        );
+      }
+    }
+  });
+
+  it('harder levels bring more random events and a bigger score multiplier', () => {
+    const counts = levels.map((difficulty) => {
+      let events = 0;
+      for (let seed = 1; seed <= 60; seed++)
+        events += runMission({ ...cubesat, difficulty }, seed).run.events.length;
+      return events;
+    });
+    expect(counts[0]).toBeLessThan(counts[1]!);
+    expect(counts[1]).toBeLessThan(counts[2]!);
+    const mult = levels.map(
+      (difficulty) => runMission({ ...cubesat, difficulty }, 1).report.multiplier,
+    );
+    expect(mult).toEqual([1, 1.15, 1.3]);
+  });
+
+  it('Flight Director lists every red risk fix, sized for a CubeSat', () => {
+    const r = reviewDesign({ ...cubesat, difficulty: 'flight-director' });
+    const item = r.readiness.items.find((i) => i.id === 'risk')!;
+    expect(item.status).toBe('red');
+    expect(item.critical).toBe(true);
+    const reds = r.risks.filter((x) => x.level === 'red');
+    expect(reds.length).toBeGreaterThan(0);
+    for (const x of reds) expect(item.fix).toContain(x.name);
+    expect(item.fix).toMatch(/Radiation-tolerant CubeSat computer/);
+  });
+});

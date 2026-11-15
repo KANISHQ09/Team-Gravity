@@ -93,6 +93,8 @@ export function risksFromAnalysis(a: DesignAnalysis): Risk[] {
   const h = hazards(a);
   const m = mitigationFacts(a);
   const flightDays = (a.resolved.orbit?.transferDays ?? 0) + a.resolved.scenario.missionDays;
+  // Name a fix that actually fits: a CubeSat cannot carry an 8 kg rad-hard computer.
+  const cube = a.resolved.parts.some((p) => p.id === 'bus-cubesat-6u');
   const make = (
     type: EventType,
     probability: number,
@@ -121,7 +123,7 @@ export function risksFromAnalysis(a: DesignAnalysis): Risk[] {
       overDays(h.speDaily, flightDays),
       4,
       m.radHard,
-      'Radiation-hardened computer',
+      cube ? 'Radiation-tolerant CubeSat computer' : 'Radiation-hardened computer',
     ),
     make(
       'reaction-wheel-failure',

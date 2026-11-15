@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { ExitMission } from './ExitMission.tsx';
 import { Button, Card, GaugeBar, Hint, StatusBadge } from '../components/ui.tsx';
 import { STAGE_HINTS } from '../features/education/hints.ts';
 import { RequirementsStage } from '../features/requirements/RequirementsStage.tsx';
@@ -47,10 +48,13 @@ export function MissionLayout() {
         <p className="text-sm text-slate-400">
           {scenario.name} · {DIFFICULTY_LABEL[design.difficulty]}
         </p>
-        <p className="text-sm text-slate-400">
-          Readiness {pct(review.readiness.greenFraction)} green ·{' '}
-          {review.canLaunch ? 'launch allowed' : 'launch blocked'}
-        </p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-slate-400">
+            Readiness {pct(review.readiness.greenFraction)} green ·{' '}
+            {review.canLaunch ? 'launch allowed' : 'launch blocked'}
+          </p>
+          <ExitMission />
+        </div>
       </div>
 
       <nav aria-label="Mission stages">

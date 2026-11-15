@@ -87,6 +87,8 @@ interface GameState {
   dismissNotice(): void;
   recordRun(result: MissionResult): void;
   setPilot(pilot: PilotSummary | null): void;
+  /** Close the current mission and return home (leaves an online room first). Run history is kept. */
+  exitMission(): void;
 }
 
 const PLAYER_NAMES = ['Player 1', 'Player 2', 'Player 3', 'Player 4'];
@@ -114,6 +116,8 @@ export interface RemoteActions {
   launch(): void;
   /** Leave the room but keep the design for solo iteration. */
   leaveKeepingDesign(): void;
+  /** Leave the room for good (frees the seat at once). */
+  leave(): void;
 }
 let remote: RemoteActions | null = null;
 export const registerRemote = (r: RemoteActions | null) => {
@@ -264,6 +268,24 @@ export const useGame = create<GameState>()(
       dismissNotice: () => set({ notice: null }),
 
       setPilot: (pilot) => set({ pilot }),
+
+      exitMission: () => {
+        online()?.leave();
+        set({
+          screen: 'home',
+          stage: 'goals',
+          design: null,
+          players: [],
+          activePlayer: 0,
+          proposals: [],
+          proposalsResolved: 0,
+          votes: [],
+          noGoVotes: 0,
+          result: null,
+          pilot: null,
+          notice: null,
+        });
+      },
 
       recordRun: (result) => {
         const { design } = result.run;

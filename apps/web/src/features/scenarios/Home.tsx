@@ -3,6 +3,7 @@ import { catalog } from '@gravity/engine';
 import type { Body, Difficulty } from '@gravity/shared';
 import { Button } from '../../components/ui.tsx';
 import { useReducedMotion } from '../../hooks/useReducedMotion.ts';
+import { onlineConfigured } from '../../lib/api.ts';
 import { DIFFICULTY_LABEL, bodyName, fmt } from '../../lib/format.ts';
 import { decodeDesign, STAGES, useGame } from '../../store/game.ts';
 import { OnlineLobby } from '../rooms/OnlineLobby.tsx';
@@ -10,7 +11,8 @@ import { OnlineLobby } from '../rooms/OnlineLobby.tsx';
 const DIFFICULTY_HELP: Record<Difficulty, string> = {
   explorer: 'Simple parts, hints on, 10% margins. Like a first sketch of a mission (CML 1–2).',
   engineer: 'All parts, 20% margins and trade-offs between designs (CML 3).',
-  'flight-director': '35% margins, strict readiness review, more surprises (CML 4).',
+  'flight-director':
+    '35% margins on hardware (20% on budget and schedule), every high risk must be mitigated, more surprises (CML 4).',
 };
 
 const STAGE_HELP: Record<string, string> = {
@@ -53,7 +55,7 @@ export function Home() {
             ['3', 'missions: Earth, Moon and Mars'],
             [String(catalog.parts.length), 'spacecraft parts to choose from'],
             ['6', 'resources to balance'],
-            ['1–4', 'players, solo or as a team'],
+            [String(catalog.orbits.length), 'orbits around Earth, the Moon and Mars'],
           ].map(([n, label]) => (
             <div key={label} className="flex flex-col py-6 md:py-8">
               <dt className="text-xs uppercase tracking-[0.2em] text-slate-400">{label}</dt>
@@ -93,9 +95,12 @@ export function Home() {
         </section>
 
         <section aria-labelledby="online-heading" className="scroll-mt-20 space-y-6">
-          <SectionTitle id="online-heading" eyebrow="Mission control is a team">
-            Play online with friends
-          </SectionTitle>
+          <div className="flex flex-wrap items-end gap-3">
+            <SectionTitle id="online-heading" eyebrow="Mission control is a team">
+              Play online with friends
+            </SectionTitle>
+            {!onlineConfigured && <SoonBadge />}
+          </div>
           <div className="rounded-xl border border-white/10 bg-gradient-to-br from-slate-900 to-black p-6">
             <OnlineLobby />
           </div>
@@ -140,6 +145,14 @@ export function Home() {
         </section>
       </div>
     </div>
+  );
+}
+
+function SoonBadge() {
+  return (
+    <span className="mb-1 rounded-full border border-orange-400/70 bg-orange-500/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-orange-300">
+      Coming soon
+    </span>
   );
 }
 
@@ -235,6 +248,11 @@ function Hero({
             className="rounded-full border border-white/70 px-7 py-3 text-sm font-bold uppercase tracking-widest text-white transition hover:bg-white hover:text-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             Play with friends
+            {!onlineConfigured && (
+              <span className="ml-2 rounded-full bg-orange-500 px-2 py-0.5 text-[10px] text-black">
+                Soon
+              </span>
+            )}
           </button>
           {onContinue && (
             <button
@@ -268,7 +286,6 @@ function ScenarioCard({
 }) {
   const s = catalog.scenarios.find((x) => x.id === scenarioId)!;
   const [difficulty, setDifficulty] = useState<Difficulty>(s.recommendedDifficulty);
-  const [players, setPlayers] = useState(1);
   const idBase = `scn-${s.id}`;
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl border border-white/10 bg-gradient-to-b from-slate-900 to-black transition hover:border-orange-400/60">
@@ -316,24 +333,10 @@ function ScenarioCard({
           <p id={`${idBase}-difficulty-help`} className="text-xs text-slate-400">
             {DIFFICULTY_HELP[difficulty]}
           </p>
-          <label htmlFor={`${idBase}-players`} className="block text-sm font-medium">
-            Players on this device
-          </label>
-          <select
-            id={`${idBase}-players`}
-            value={players}
-            onChange={(e) => setPlayers(Number(e.target.value))}
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-2 py-1.5 text-sm"
-          >
-            <option value={1}>1: solo</option>
-            <option value={2}>2: team, take turns</option>
-            <option value={3}>3: team, take turns</option>
-            <option value={4}>4: team, one role each</option>
-          </select>
           <button
             type="button"
             className="mt-1 w-full rounded-full bg-white px-4 py-2.5 text-sm font-bold uppercase tracking-widest text-black transition hover:bg-orange-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-300"
-            onClick={() => onStart(s.id, difficulty, players)}
+            onClick={() => onStart(s.id, difficulty, 1)}
           >
             Start {s.name}
           </button>

@@ -169,8 +169,9 @@ export function readinessFromAnalysis(a: DesignAnalysis): Readiness {
       red.length || yellow.length
         ? [...red, ...yellow].map((r) => `${r.name} (score ${r.score})`).join('; ')
         : 'All risks are low or mitigated.',
-    fix: red[0]
-      ? `Mitigation: ${red[0].mitigation}.`
+    // List every red risk's fix at once, so players do not discover them one by one.
+    fix: red.length
+      ? `Mitigate: ${red.map((r) => `${r.name} → ${r.mitigation}`).join('; ')}.`
       : yellow[0]
         ? `Consider: ${yellow[0].mitigation}.`
         : null,

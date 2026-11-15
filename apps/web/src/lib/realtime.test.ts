@@ -198,6 +198,18 @@ describe('online room client', () => {
       expect(useGame.getState().notice).toMatch(/freed your seat/);
     });
 
+    it('exiting the mission while online leaves the room first', () => {
+      const { socket, emitted } = fakeSocket();
+      useOnline.getState().set({ active: true, me: 'me', code: 'K7QX2M' });
+      attach(socket, 'K7QX2M');
+      useGame.setState({ design, screen: 'mission' });
+      useGame.getState().exitMission();
+      expect(emitted.at(-1)).toEqual({ event: 'room:leave', payload: {} });
+      expect(useOnline.getState().active).toBe(false);
+      expect(useGame.getState().design).toBeNull();
+      expect(useGame.getState().screen).toBe('home');
+    });
+
     it('leaving tells the server first, so the seat frees at once', () => {
       const { socket, emitted } = fakeSocket();
       useOnline.getState().set({ active: true, me: 'me', code: 'K7QX2M' });
