@@ -39,6 +39,7 @@ export function Hangar() {
     nonce: 0,
   });
   const [xray, setXray] = useState(false);
+  const [panels, setPanels] = useState(true);
   const [autoRotate, setAutoRotate] = useState(!reduced);
   const [selected, setSelected] = useState<string | null>(null);
   const [testStart, setTestStart] = useState<number | null>(null);
@@ -111,7 +112,7 @@ export function Hangar() {
       {view.on && (
         <div className="relative overflow-hidden rounded-2xl border border-cyan-400/20 bg-black">
           <div
-            className="h-[min(68vh,560px)] min-h-[340px] w-full"
+            className="h-[min(82vh,820px)] min-h-[460px] w-full"
             role="img"
             aria-label={`3D model of your spacecraft. ${layout.description}`}
           >
@@ -174,6 +175,14 @@ export function Hangar() {
             </button>
             <button
               type="button"
+              className={cx(chip(panels), 'hidden lg:inline-block')}
+              aria-pressed={panels}
+              onClick={() => setPanels((v) => !v)}
+            >
+              Panels
+            </button>
+            <button
+              type="button"
               disabled={testStart !== null || !layout.bus.present}
               onClick={() => {
                 setResults(null);
@@ -194,7 +203,8 @@ export function Hangar() {
           <div
             className={cx(
               HUD,
-              'hud-corners absolute right-3 top-20 hidden w-72 space-y-2 p-3 lg:block',
+              'hud-corners absolute right-3 top-20 hidden w-64 space-y-2 p-3',
+              panels && 'lg:block',
             )}
           >
             <p className="font-mono text-[11px] uppercase tracking-widest text-slate-400">
@@ -223,39 +233,11 @@ export function Hangar() {
           <div
             className={cx(
               HUD,
-              'hud-corners absolute left-3 top-20 hidden max-h-[45%] w-60 overflow-y-auto p-3 lg:block',
+              'hud-scroll hud-corners absolute left-3 top-20 hidden max-h-[58%] w-60 overflow-y-auto overflow-x-hidden p-3',
+              panels && 'lg:block',
             )}
           >
             <ModuleList parts={parts} selected={selected} onSelect={setSelected} />
-          </div>
-
-          {/* Telemetry */}
-          <div
-            className={cx(
-              HUD,
-              'hud-corners absolute inset-x-3 bottom-3 hidden grid-cols-3 gap-x-4 gap-y-2 px-4 py-2.5 md:grid xl:grid-cols-6',
-            )}
-          >
-            {data.review.gauges.map((g) => (
-              <div key={g.key} className="min-w-0">
-                <div className="flex items-center justify-between gap-1">
-                  <span className="truncate font-mono text-[10px] uppercase tracking-widest text-slate-400">
-                    {g.label}
-                  </span>
-                  <StatusBadge status={g.status} />
-                </div>
-                <p className="font-mono text-sm font-bold text-white">
-                  {fmt(g.used, 1)}
-                  <span className="text-xs font-normal text-slate-400">
-                    {' '}
-                    / {g.limit === null ? '?' : fmt(g.limit, 1)} {g.unit}
-                  </span>
-                </p>
-                <p className="font-mono text-[10px] text-slate-500">
-                  {g.margin === null ? 'limit unknown' : `${pct(g.margin)} spare`}
-                </p>
-              </div>
-            ))}
           </div>
 
           <div
@@ -301,6 +283,39 @@ export function Hangar() {
             </div>
           )}
         </div>
+      )}
+
+      {view.on && (
+        <>
+          {/* Telemetry, below the view so it never covers the spacecraft */}
+          <div
+            className={cx(
+              HUD,
+              'hud-corners relative grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-3 sm:grid-cols-3 xl:grid-cols-6',
+            )}
+          >
+            {data.review.gauges.map((g) => (
+              <div key={g.key} className="min-w-0">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="truncate font-mono text-[10px] uppercase tracking-widest text-slate-400">
+                    {g.label}
+                  </span>
+                  <StatusBadge status={g.status} />
+                </div>
+                <p className="font-mono text-sm font-bold text-white">
+                  {fmt(g.used, 1)}
+                  <span className="text-xs font-normal text-slate-400">
+                    {' '}
+                    / {g.limit === null ? '?' : fmt(g.limit, 1)} {g.unit}
+                  </span>
+                </p>
+                <p className="font-mono text-[10px] text-slate-500">
+                  {g.margin === null ? 'limit unknown' : `${pct(g.margin)} spare`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Small screens: the side panels sit below the viewport. */}
@@ -365,15 +380,17 @@ function ModuleList({
                 aria-pressed={selected === p.id}
                 onClick={() => onSelect(p.id)}
                 className={cx(
-                  'flex w-full items-center justify-between gap-2 rounded px-2 py-1 text-left font-mono text-xs transition',
+                  'block w-full min-w-0 rounded-md border px-2 py-1.5 text-left transition',
                   selected === p.id
-                    ? 'border border-cyan-400/50 bg-cyan-500/20 text-cyan-100'
-                    : 'text-slate-300 hover:bg-slate-800/80',
+                    ? 'border-cyan-400/60 bg-cyan-500/20 text-cyan-50'
+                    : 'border-transparent text-slate-200 hover:border-white/10 hover:bg-slate-800/70',
                 )}
               >
-                <span className="truncate">{p.name}</span>
-                <span className="shrink-0 text-slate-500">
-                  {count(p.id) > 1 ? `×${count(p.id)} ` : ''}
+                <span className="block truncate text-xs font-semibold" title={p.name}>
+                  {p.name}
+                </span>
+                <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-slate-500">
+                  {count(p.id) > 1 ? `×${count(p.id)} · ` : ''}
                   {CATEGORY_LABEL[p.category]}
                 </span>
               </button>

@@ -1,6 +1,7 @@
 import { instrumentsFor } from '@gravity/engine';
 import { Card, StatusBadge } from '../../components/ui.tsx';
 import { useReview } from '../../hooks/useReview.ts';
+import { cx } from '../../lib/format.ts';
 import { useGame } from '../../store/game.ts';
 
 export function GoalsStage() {
@@ -31,32 +32,55 @@ export function GoalsStage() {
         </p>
       </Card>
 
-      <fieldset className="space-y-2">
-        <legend className="mb-2 text-lg font-semibold">Science goals</legend>
-        {scenario.goals.map((g) => (
-          <div
-            key={g.id}
-            className="flex items-start gap-3 rounded-md border border-slate-700 p-3 hover:bg-slate-800/60"
-          >
-            <input
-              id={`goal-${g.id}`}
-              type="checkbox"
-              className="mt-1 h-4 w-4"
-              checked={design.goalIds.includes(g.id)}
-              onChange={() => toggle(g.id)}
-              aria-describedby={`goal-${g.id}-detail`}
-            />
-            <div>
-              <label htmlFor={`goal-${g.id}`} className="cursor-pointer font-medium">
-                {g.title}
-              </label>
-              <p id={`goal-${g.id}-detail`} className="text-sm text-slate-400">
-                Needs: {g.measurement.replace('-', ' ')} · weight {Math.round(g.weight * 100)}% of
-                the science
-              </p>
-            </div>
-          </div>
-        ))}
+      <fieldset className="space-y-3">
+        <legend className="mb-3 text-lg font-semibold">Science goals</legend>
+        <div className="grid gap-3 md:grid-cols-2">
+          {scenario.goals.map((g) => {
+            const on = design.goalIds.includes(g.id);
+            return (
+              <div
+                key={g.id}
+                className={cx(
+                  'relative flex items-start gap-3 rounded-xl border p-4 transition',
+                  on
+                    ? 'border-orange-400/70 bg-orange-500/10'
+                    : 'border-white/10 bg-white/[0.02] hover:border-white/30',
+                )}
+              >
+                <input
+                  id={`goal-${g.id}`}
+                  type="checkbox"
+                  className="relative z-10 mt-1 h-5 w-5 shrink-0 accent-orange-500"
+                  checked={on}
+                  onChange={() => toggle(g.id)}
+                  aria-describedby={`goal-${g.id}-detail`}
+                />
+                <div className="min-w-0 flex-1 space-y-2">
+                  {/* The label stretches over the whole card, so any click toggles the goal. */}
+                  <label
+                    htmlFor={`goal-${g.id}`}
+                    className="block cursor-pointer font-semibold text-white after:absolute after:inset-0 after:content-['']"
+                  >
+                    {g.title}
+                  </label>
+                  <p id={`goal-${g.id}-detail`} className="text-sm text-slate-400">
+                    Needs: {g.measurement.replace('-', ' ')} · weight {Math.round(g.weight * 100)}%
+                    of the science
+                  </p>
+                  <div
+                    aria-hidden="true"
+                    className="h-1.5 overflow-hidden rounded-full bg-white/10"
+                  >
+                    <div
+                      className={cx('h-full rounded-full', on ? 'bg-orange-400' : 'bg-slate-500')}
+                      style={{ width: `${Math.round(g.weight * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </fieldset>
 
       <section aria-labelledby="stm-heading" className="space-y-2">
