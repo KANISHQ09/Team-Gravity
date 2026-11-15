@@ -13,6 +13,8 @@ export interface SensitivityRow {
   readonly costDeltaM: number;
   /** Whether the changed design could still launch. */
   readonly launchable: boolean;
+  /** Why it could not launch (first blocking problem), or null when it can. */
+  readonly blockedBy: string | null;
 }
 
 export interface Sensitivity {
@@ -26,12 +28,18 @@ const SAMPLE_SEEDS = [11, 23, 37, 41, 59];
 
 function evaluate(design: Design, catalog: Catalog) {
   const a = analyzeDesign(design, catalog);
-  const launchable = !hasBlockingErrors(validateAnalysis(a)) && readinessFromAnalysis(a).ready;
+  const issues = validateAnalysis(a);
+  const ready = readinessFromAnalysis(a).ready;
+  const launchable = !hasBlockingErrors(issues) && ready;
+  const blockedBy = launchable
+    ? null
+    : (issues.find((i) => i.severity === 'error')?.message ??
+      'The launch-readiness review would no longer pass.');
   const science = launchable
     ? SAMPLE_SEEDS.reduce((s, seed) => s + simulateAnalysis(a, seed).science, 0) /
       SAMPLE_SEEDS.length
     : 0;
-  return { science, costM: a.costM, launchable };
+  return { science, costM: a.costM, launchable, blockedBy };
 }
 
 /**
@@ -79,8 +87,14 @@ export function sensitivity(design: Design, catalog: Catalog): Sensitivity {
       scienceDelta: r.science - base.science,
       costDeltaM: r.costM - base.costM,
       launchable: r.launchable,
+      blockedBy: r.blockedBy,
     };
   });
-  rows.sort((x, y) => Math.abs(y.scienceDelta) - Math.abs(x.scienceDelta));
+  // Useful changes first; changes that would block the launch go last.
+  rows.sort(
+    (x, y) =>
+      Number(x.launchable === false) - Number(y.launchable === false) ||
+      Math.abs(y.scienceDelta) - Math.abs(x.scienceDelta),
+  );
   return { baseScience: base.science, baseCostM: base.costM, rows };
 }
