@@ -30,13 +30,13 @@
     "@types/react-dom": "^18.3.7",
     "@types/three": "0.171.0",
     "@vitejs/plugin-react": "^6.3.0",
-    "axe-core": "^4.14.0",
+    "axe-core": "^4.14.1",
     "jsdom": "^31.0.1",
     "tailwindcss": "^4.3.5",
     "typescript": "~6.0.3",
     "vite": "^8.3.8",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.1.0",
+    "vitest": "^5.1.1",
     "workbox-build": "^7.4.1",
     "workbox-window": "^7.4.1"
   }
