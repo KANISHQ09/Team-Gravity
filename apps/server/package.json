@@ -15,7 +15,7 @@
   "dependencies": {
     "@fastify/cookie": "^11.1.5",
     "@fastify/cors": "^11.4.3",
-    "@fastify/jwt": "^10.2.7",
+    "@fastify/jwt": "^10.2.8",
     "@fastify/rate-limit": "^11.2.2",
     "@gravity/catalog": "workspace:*",
     "@gravity/engine": "workspace:*",
